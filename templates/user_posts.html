@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <div class="media">
+
+        <a href="{{image_path}}/{{user.image_file}}">
+            <img class="rounded-circle account-img" src="{{image_path}}/{{user.image_file}}"/>
+        </a>
+
+        <div class="media-body">
+            <div class="article-metadata">
+
+                {% if user.team.logo %}
+                <span class="badge badge-pill badge-secondary">{{ user.team.name }}</span>
+                {% endif %}
+
+                <div class="container-egen">
+                    <h2 class="left">{{ user.username }}</h2>
+                    
+                    {% if current_user.id != user.id %}
+                    {% if is_following %}
+                        <h3><a href="{{ url_for('follow_user', user_id=user.id) }}" class="right badge badge-dark">Following</a></h3>
+                    {% else %}
+                        <h3><a href="{{ url_for('follow_user', user_id=user.id) }}" class="right badge badge-primary">Follow</a></h3>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <small class="text-muted">Account created: {{ user.date_created.strftime('%Y-%m-%d') }}</small>
+            
+            <div class="media-body">
+                <h6 class="mb-1">Written posts: {{ post.total }}</h6>
+                <h6 class="mb-1">Written comments: {{ no_of_user_comments }}</h6>
+                <h6 class="mb-1">Recieved likes: {{ no_of_recieved_likes }}</h6>
+                <h6 class="mb-3">Followers: {{ no_of_followers }}</h6>
+            </div>
+        </div>
+    </div>
+
+    {% for post in post.items %}
+    <article class="media content-section">
+        <div class="media-body">
+            {% include 'post_template.html' %}
+        </div>
+    </article>
+    {% endfor %}
+
+
+
+    <!-- Paging -->
+    {% for page_num in post.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+            {% if post.page == page_num %}
+                <a class="btn btn-secondary mb-4" href="{{ url_for('user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+                <a class="btn btn-outline-secondary mb-4" href="{{ url_for('user_posts', username=user.username, page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+            ...
+        {% endif %}
+    {% endfor %}
+    
+{% endblock content %}

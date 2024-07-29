@@ -1,0 +1,86 @@
+<div class="modal-body">
+    <form method="POST" action="">
+        {{ post_form.hidden_tag() }}
+
+        <div class="form-group">
+            {{ post_form.team.label(class="form-control-label") }}
+
+            {% if post_form.team.errors %}
+                {{ post_form.team(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in post_form.team.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ post_form.team(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+
+
+        <div class="form-group">
+            {{ post_form.locked.label(class="form-control-label mr-2") }}
+            {% if post_form.locked.errors %}
+                {{ post_form.locked(class="form-control is-invalid", rows="3") }}
+                <div class="invalid-feedback">
+                    {% for error in post_form.locked.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ post_form.locked(class="", id="postTitle") }}
+            {% endif %}
+        </div>
+
+
+        <div class="form-group">
+            {{ post_form.tag.label(class="form-control-label") }}
+
+            {% if post_form.tag.errors %}
+                {{ post_form.tag(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in post_form.tag.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">#</span>
+                    {{ post_form.tag(class="form-control form-control-lg") }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ post_form.title.label(class="form-control-label") }}
+
+            {% if post_form.title.errors %}
+                {{ post_form.title(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in post_form.title.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ post_form.title(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ post_form.content.label(class="form-control-label") }}
+
+            {% if post_form.content.errors %}
+                {{ post_form.content(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in post_form.content.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ post_form.content(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ post_form.submit(class="btn btn-outline-success") }}
+        </div>
+    </form>
+</div>

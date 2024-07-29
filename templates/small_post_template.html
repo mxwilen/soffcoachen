@@ -1,0 +1,66 @@
+<div class="article-metadata d-flex align-items-center">
+
+    <a class="mr-2" href="{{ url_for('user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
+
+    {% if post.author.team.name != '-' %}
+        <span class="mr-2 badge badge-pill badge-secondary">{{ post.author.team.name }}</span>
+    {% endif %}
+
+    
+    <div class="ml-auto">
+
+        {% if current_user.is_authenticated %}
+
+            {% if current_user.has_liked_post(post) %}
+            <a id="like-post-button-{{ post.id }}" onclick="likePostAction('{{ post.id }}', 'unlike'); return false;" class="mr-1" role="button">
+                <img id="like-post-img-{{ post.id }}" src="{{ url_for('static', filename='hand.thumbsup.fill.png') }}" alt="Thumbs Up Icon">
+            </a>
+            {% else %}
+
+            <a id="like-post-button-{{ post.id }}" onclick="likePostAction('{{ post.id }}', 'like'); return false;" class="mr-1" role="button">
+                <img id="like-post-img-{{ post.id }}" src="{{ url_for('static', filename='hand.thumbsup.png') }}" alt="Thumbs Up Icon">
+            </a>
+            {% endif %}
+        {% else %}
+        <a class="mr-1">
+            <img src="{{ url_for('static', filename='hand.thumbsup.png') }}" alt="Thumbs Up Icon">
+        </a>
+        {% endif %}
+        <small id="like-post-count-{{ post.id }}" class="mr-2">{{ post.likes.count() }}</small>
+        
+    </div>
+</div>
+
+
+{% if post.team or post.tag %}
+<nav class="mt-2" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+
+        {% if post.team.logo is not none %}
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('team', team=post.team.name) }}">{{ post.team.name }}</a>
+            </li>
+
+            {% if post.tag %}
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('team', team=post.team.name, tag=post.tag if post.tag else '') }}">#{{ post.tag }}</a>
+            </li>
+            {% endif %}
+        {% else %}
+            
+            {% if post.tag %}
+            <li class="breadcrumb-item">
+                <a>#{{ post.tag }}</a>
+            </li>
+            {% endif %}
+        
+        {% endif %}
+    </ol>
+</nav>
+{% endif %}
+
+
+<a href="{{ url_for('post', post_id=post.id) }}" role="button">
+    <h4 id="post-title-{{ post.id }}" class="article-title">{{ post.title }}</h4>
+    <h6 id="post-content-{{ post.id }}" class="article-content">{{ post.content }}</h6>
+</a>

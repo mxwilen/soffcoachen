@@ -1,0 +1,89 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+    {% if not current_user.is_authenticated %}
+    <div class="jumbotron">
+        <h1 class="display-6">Välkommen till SoffCoachen!</h1>
+        <p class="lead">Forumet för allsvenskan-entusiaster. Oavsett lag, oavsett ämne.</p>
+        <hr class="my-4">
+        <h4 class="mb-0"> - Har du en tanke som gnager?</h4>
+        <h4 class="mb-4"> - Vill du veta mer om de senaste ryktena?</h4>
+        <h5>Vädra dina åsikter och hoppas på medhåll.</h5>
+        <hr class="my-4">
+        <h4>Har du inget konto? Skapa det <a href="{{ url_for('register') }}">här</a>.</h4>
+    </div>
+    {% endif %}
+
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                {% if current_user.is_authenticated %}
+                <div class="mb-4 d-flex flex-column">
+                    <button type="button" class="p-2 btn btn-primary" data-toggle="modal" data-target="#NewPostModalCenter">Click here to post something new!</button>
+                </div>
+                {% else %}
+                <div class="mb-4 d-flex flex-column">
+                    <a class="p-2 btn btn-primary" href="{{ url_for('login') }}">
+                        Click here to login!
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-sm">
+                <div class="dropdown mb-4 d-flex flex-column">
+                    <button class="p-2 btn btn-outline-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Search posts
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {% include 'filter_posts_template.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% for post in post.items %}
+    <article class="media content-section">
+        <div class="media-body">
+            {% include 'post_template.html' %}
+        </div>
+    </article>
+    {% endfor %}
+
+    <div>
+        {% for page_num in post.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+            {% if page_num %}
+                {% if post.page == page_num %}
+                    <a class="btn btn-secondary mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+                {% else %}
+                    <a class="btn btn-outline-secondary mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+                {% endif %}
+            {% else %}
+                ...
+            {% endif %}
+        {% endfor %}
+    </div>
+
+
+
+    <div class="modal fade" id="NewPostModalCenter" tabindex="-1" role="dialog" aria-labelledby="NewPostModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="NewPostModalLongTitle">New Post</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    {% include 'new_post_template.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+{% endblock content %}

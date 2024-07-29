@@ -1,0 +1,164 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    
+    <article class="media content-section">
+        <div class="media-body">
+            {% include 'post_template.html' %}
+
+
+            <div class="mb-2">
+                {% if post.date_edited %}
+                <small id="post-date-{{ post.id }}" class="text-muted">(Updated: {{ post.date_edited.strftime('%Y-%m-%d %H:%M:%S') }})</small>
+                {% endif %}
+            </div>
+        
+            <div>
+                {% if current_user.is_authenticated %}
+                    <button data-toggle="modal" data-target="#CommentModalCenter" onclick="commentPost('{{ post.id }}', '{{ current_user.username }}')" class="btn btn-sm btn-primary">Comment</button>
+                {% endif %}
+                {% if post.author == current_user %}
+                    <button data-toggle="modal" data-target="#EditModalCenter" onclick="editPost('{{ post.id }}')" class="btn btn-sm btn-secondary">Edit</button>
+                    <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#DeleteModalCenter">Delete</button>
+                {% endif %}
+            </div>
+        </div>
+    </article>
+
+
+    <div class="media-body">       
+        {% if has_comments %}
+            <h2>Comments</h2>
+
+
+            {% for comment in post.comments|reverse %}
+                {% if not comment.parent_id %}
+                    {% include 'comment_template.html' %}
+                {% endif %}
+            {% endfor %}
+
+
+        {% else %}
+            <h6 class="mb-5">No comments yet. Be the first to comment!</h6>
+        {% endif %}
+    </div>
+    
+        
+    <!-- Modals -->
+    {% if current_user.is_authenticated %}
+        <div class="modal fade" id="DeleteModalCenter" tabindex="-1" role="dialog" aria-labelledby="DeleteModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="DeleteModalLongTitle">DELETE POST</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-footer">
+                        <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input class="btn btn-danger" type="submit" value="DELETE">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="EditModalCenter" tabindex="-1" role="dialog" aria-labelledby="EditModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="EditModalLongTitle">Edit Post</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div id="editForm" class="modal-body">
+
+                        <form id="updatePostForm" method="POST" name="edit">
+                            {{ update_form.hidden_tag() }}
+                            
+                            <input type="hidden" id="postId">
+                            <div class="form-group">
+                                {{ update_form.title.label(class="form-control-label") }}
+                                {% if update_form.title.errors %}
+                                    {{ update_form.title(class="form-control is-invalid", rows="3") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in update_form.title.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ update_form.title(class="form-control", id="postTitle", rows="3") }}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                {{ update_form.content.label(class="form-control-label") }}
+                                {% if update_form.content.errors %}
+                                    {{ update_form.content(class="form-control is-invalid", rows="3") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in update_form.content.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ update_form.content(class="form-control", id="postContent", rows="3") }}
+                                {% endif %}
+                            </div>
+
+                            <div class="form-group">
+                                {{ update_form.submit(class="btn btn-outline-success") }}
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <div class="modal fade" id="CommentModalCenter" tabindex="-1" role="dialog" aria-labelledby="CommentModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="CommentModalLongTitle">COMMENT POST</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div id="commentForm" class="modal-body">
+
+                        <form id="commentPostForm" method="POST" name="comment">
+                            {{ comment_form.hidden_tag() }}
+                            
+                            <input type="hidden" id="postId">
+                            <input type="hidden" id="username">
+                            <input type="hidden" id="parentCommentId">
+                            <div class="form-group">
+                                {{ comment_form.content.label(class="form-control-label", for="commentContent") }}
+                                {% if comment_form.content.errors %}
+                                    {{ comment_form.content(class="form-control is-invalid", id="commentContent", rows="3") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in comment_form.content.errors %}
+                                            <span>{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ comment_form.content(class="form-control", id="commentContent", rows="3") }}
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                {{ comment_form.submit(class="btn btn-outline-success") }}
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    
+{% endblock content %}

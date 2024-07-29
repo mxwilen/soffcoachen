@@ -1,0 +1,57 @@
+<nav class="mr-4 ml-4 mb-4 mt-4">
+
+    <form class="form" method="POST" action="">
+        {{ search_form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ search_form.team.label(class="form-control-label") }}
+            {% if search_form.team.errors %}
+                {{ search_form.team(class="form-control is-invalid", rows="3") }}
+                <div class="invalid-feedback">
+                    {% for error in search_form.team.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ search_form.team(class="form-control", id="postTitle", rows="3") }}
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ search_form.tag.label(class="form-control-label") }}
+            {% if search_form.tag.errors %}
+                {{ search_form.tag(class="form-control is-invalid", rows="3") }}
+                <div class="invalid-feedback">
+                    {% for error in search_form.tag.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ search_form.tag(class="form-control", id="postTitle", rows="3") }}
+            {% endif %}
+        </div>
+
+        {% if current_user.is_authenticated %}
+        <div class="form-group">
+            {{ search_form.check.label(class="form-control-label mr-2") }}
+            {% if search_form.check.errors %}
+                {{ search_form.check(class="form-control is-invalid", rows="3") }}
+                <div class="invalid-feedback">
+                    {% for error in search_form.check.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ search_form.check(class="", id="postTitle") }}
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            {{ search_form.submit(class="btn btn-outline-success") }}
+        </div>
+
+    </form>
+    
+</nav>
+  

@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb d-flex justify-content-center mb-4 team-page">
+        
+        {% if tag %}
+        <li class="breadcrumb-item">
+            <img class="mr-2 team-logo" src="{{ url_for('static', filename='team-logos/' + team.abr + '.png') }}">
+            <a href="{{ url_for('team', team=team.name) }}">{{ team.name }}</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <a>#{{ tag }}</a>
+        </li>
+
+        {% else %}
+        <li class="breadcrumb-item active" aria-current="page">
+            <img class="mr-2 team-logo" src="{{ url_for('static', filename='team-logos/' + team.abr + '.png') }}">
+            <a>{{ team.name }}</a>
+        </li>
+        {% endif %}
+    </ol>
+</nav>
+
+<nav class="content-section navbar-light bg-light mb-4">
+    <h5>Search tags:</h5>
+    <div class="container-fluid">
+        <div class="scrolling-wrapper row flex-row flex-nowrap pt-2">
+            {% for tag in tags %}
+                <div class="mr-4 ml-auto">
+                    <h5>
+                        <a href="{{ url_for('team', team=team.name, tag=tag) }}">#{{ tag }}</a>
+                    </h5>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</nav>
+
+        
+{% if current_user.is_authenticated %}
+<div class="mb-4 d-flex flex-column">
+    <button type="button" class="p-2 btn btn-primary" data-toggle="modal" data-target="#NewPostModalCenter">Click here to post something new!</button>
+</div>
+{% endif %}
+
+
+    {% for post in post.items %}
+    <article class="media content-section">
+        <div class="media-body">
+
+            {% include 'post_template.html' %}
+        </div>
+    </article>
+    {% endfor %}
+
+    
+    {% for page_num in post.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+            {% if post.page == page_num %}
+                <a class="btn btn-secondary mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+                <a class="btn btn-outline-secondary mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+        {% else %}
+            ...
+        {% endif %}
+    {% endfor %}
+
+
+
+    <div class="modal fade" id="NewPostModalCenter" tabindex="-1" role="dialog" aria-labelledby="NewPostModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="NewPostModalLongTitle">New Post</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    {% include 'new_post_template.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+{% endblock content %}

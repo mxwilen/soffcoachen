@@ -1,0 +1,168 @@
+body {
+  background: #fafafa;
+  color: #333333;
+  margin-top: 5rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #444444;
+}
+
+h6 {
+  font-size: 0.875rem; /* Matches the typical size of the small tag */
+  margin-bottom: 0.5rem; /* Optional: adjust spacing as needed */
+}
+
+
+
+.scrolling-wrapper{
+  overflow-x: auto;
+}
+.subtitle{
+  font-size: 1.25em;
+  opacity: 0.65;
+}
+.card-block{
+  height: 50px;
+  background-color: #fff;
+  border: none;
+  background-position: center;
+  background-size: cover;
+  transition: all 0.2s ease-in-out !important;
+  border-radius: 24px;
+  &:hover{
+    transform: translateY(-5px);
+    box-shadow: none;
+    opacity: 0.9;
+  }
+}
+
+
+
+.bg-steel {
+  background-color: #001b2f;
+}
+
+.site-header .navbar-nav .nav-link {
+  color: #c6c6c6;
+}
+
+.site-header .navbar-nav .nav-link:hover {
+  color: #ffffff;
+}
+
+.site-header .navbar-nav .nav-link.active {
+  font-weight: 500;
+}
+
+.content-section {
+  background: #ffffff;
+  padding: 10px 20px;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  margin-bottom: 10px;
+}
+
+.article-title {
+  color: #444444;
+}
+
+a.article-title:hover {
+  color: #428bca;
+  text-decoration: none;
+}
+
+.article-content {
+  white-space: pre-line;
+}
+
+.article-img {
+  height: 65px;
+  width: 65px;
+  margin-right: 16px;
+}
+
+.article-metadata {
+  padding-bottom: 1px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e3e3e3
+}
+
+.article-metadata a:hover {
+  color: #333;
+  text-decoration: none;
+}
+
+.article-svg {
+  width: 25px;
+  height: 25px;
+  vertical-align: middle;
+}
+
+.account-img {
+  height: 125px;
+  width: 125px;
+  margin-right: 20px;
+  margin-bottom: 16px;
+}
+
+.account-img-small {
+  height: 20px;
+  width: 20px;
+}
+
+.account-heading {
+  font-size: 2.5rem;
+}
+
+.breadcrumb {
+  padding: 2px 15px !important;
+}
+
+.team-page {
+  font-size: 30px;
+}
+
+
+/* Changing viewd box on Edit-post button press */
+.box {
+border: none;
+outline: none;
+padding: 10px 16px;
+background-color: #f1f1f1;
+cursor: pointer;
+font-size: 18px;
+}
+
+.click-to-view {
+/* Style the active class, and buttons on mouse-over */
+color: white;
+display: none;
+}
+
+.team-logo {
+width: 50px;
+height: 40px;
+object-fit: contain;
+}
+
+.team-logo-big {
+width: 70px;
+height: 60px;
+object-fit: contain;
+}
+
+
+
+.container-egen {
+display: flex;
+justify-content: space-between;
+}
+
+.left {
+text-align: left;
+}
+
+.right {
+text-align: right;
+}
