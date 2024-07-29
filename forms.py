@@ -1,4 +1,3 @@
-from flask import flash
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
@@ -9,7 +8,7 @@ from app import tags, teams
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=100)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     team = SelectField('Favorite Team *', choices=teams)
     password = PasswordField('Password', validators=[DataRequired()])

@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from itsdangerous import URLSafeTimedSerializer as Serializer
 
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Table, Column
+from sqlalchemy import Column, Integer, ForeignKey, Table, Column
 from sqlalchemy.orm import validates
 from flask_login import UserMixin
 
@@ -47,14 +47,14 @@ class Review(db.Model):
 class User(db.Model, UserMixin):
     # __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
+    username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     image_file = db.Column(db.String(100), nullable=False, default='default.jpg')
-    password = db.Column(db.String(60), nullable=False)
+    password = db.Column(db.String(100), nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(pytz.timezone('Europe/Stockholm')))
 
     # team = db.Column(db.String(20), nullable=True)
-    team_name = db.Column(db.String(80), db.ForeignKey('team.name'), nullable=True)
+    team_name = db.Column(db.String(50), db.ForeignKey('team.name'), nullable=True)
     team = db.relationship('Team', backref='members', lazy=True)
     
     posts = db.relationship('Post', backref='author', lazy=True)
@@ -159,10 +159,10 @@ class Post(db.Model):
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    team_name = db.Column(db.String(80), db.ForeignKey('team.name'))
+    team_name = db.Column(db.String(50), db.ForeignKey('team.name'))
     team = db.relationship('Team', backref='post', lazy=True)
     
-    tag = db.Column(db.String(40), nullable=True)
+    tag = db.Column(db.String(50), nullable=True)
 
     comments = db.relationship('Comment', backref='post', lazy='dynamic')
     likes = db.relationship('PostLike', backref='post', lazy='dynamic')
@@ -181,9 +181,9 @@ class Post(db.Model):
 
 class Team(db.Model):
     # __tablename__ = 'teams'
-    name = db.Column(db.String(80), primary_key=True)
-    abr = db.Column(db.String(80), nullable=False)
-    city = db.Column(db.String(80), nullable=True)
+    name = db.Column(db.String(50), primary_key=True)
+    abr = db.Column(db.String(50), nullable=False)
+    city = db.Column(db.String(50), nullable=True)
     championships = db.Column(db.Integer, default=0)
 
     logo = db.Column(db.Text, nullable=True)

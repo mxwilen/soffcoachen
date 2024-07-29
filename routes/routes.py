@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 # from models import Restaurant, Review
 from models import User, Post, Comment, Team, PostLike
 from forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, RequestResetForm, ResetPasswordForm, CommentForm, UpdatePostForm, SearchPostsForm
-from app import app, csrf, db, bcrypt, tags
+from app import app, db, bcrypt, tags
 from flask_login import login_user, current_user, logout_user, login_required
 
 from routes.route_utils import get_image_path_no_name, save_picture, send_reset_email
@@ -34,128 +34,7 @@ reset_token_bp = Blueprint('reset_token', __name__)
 
 
 
-"""
-index_bp = Blueprint('index', __name__)
-details_bp = Blueprint('details', __name__)
-create_restaurant_bp = Blueprint('create_restaurant', __name__)
-add_restaurant_bp = Blueprint('add_restaurant', __name__)
-add_review_bp = Blueprint('add_review', __name__)
-utility_bp = Blueprint('utility', __name__)
-favicon_bp = Blueprint('favicon', __name__)
-
-
-@app.route('/', methods=['GET'])
-def index():
-    print('Request for index page received')
-    restaurants = Restaurant.query.all()    
-    return render_template('index.html', restaurants=restaurants)
-
-@app.route('/<int:id>', methods=['GET'])
-def details(id):
-    return details(id,'')
-
-def details(id, message):
-    restaurant = Restaurant.query.where(Restaurant.id == id).first()
-    reviews = Review.query.where(Review.restaurant==id)
-    image_path = get_account_url() + "/" +  STORAGE_CONTAINER_NAME
-    return render_template('details.html', restaurant=restaurant, reviews=reviews, message=message, image_path=image_path)
-
-@app.route('/create', methods=['GET'])
-def create_restaurant():
-    print('Request for add restaurant page received')
-    return render_template('create_restaurant.html')
-
-@app.route('/add', methods=['POST'])
-@csrf.exempt
-def add_restaurant():
-    try:
-        name = request.values.get('restaurant_name')
-        street_address = request.values.get('street_address')
-        description = request.values.get('description')
-        if (name == "" or description == "" ):
-            raise RequestException()
-    except (KeyError, RequestException):
-        # Redisplay the restaurant entry form.
-        return render_template('create_restaurant.html', 
-            message='Restaurant not added. Include at least a restaurant name and description.')
-    else:
-        restaurant = Restaurant()
-        restaurant.name = name
-        restaurant.street_address = street_address
-        restaurant.description = description
-        db.session.add(restaurant)
-        db.session.commit()
-
-        return redirect(url_for('details', id=restaurant.id))
-
-@app.route('/review/<int:id>', methods=['POST'])
-@csrf.exempt
-def add_review(id):
-    try:
-        user_name = request.values.get('user_name')
-        rating = request.values.get('rating')
-        review_text = request.values.get('review_text')   
-        if (user_name == "" or rating == None):
-            raise RequestException()
-    except (KeyError, RequestException):
-        # Redisplay the review form.
-        restaurant = Restaurant.query.where(Restaurant.id == id).first()
-        reviews = Review.query.where(Review.restaurant==id)
-        return details(id, 'Review not added. Include at least a name and rating for review.')
-    else:
-        if request.files['reviewImage']:
-            image_data = request.files['reviewImage']
-
-            # Get size.
-            size = len(image_data.read())
-            image_data.seek(0)
-
-            print("Original image name = " + image_data.filename)
-            print("File size = " + str(size))
-
-            if (size > 2048000):
-                return details(id, 'Image too big, try again.')
-
-            # Get account_url based on environment
-            print("account_url = " + get_account_url())
-
-            # Create client
-            azure_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
-            blob_service_client = BlobServiceClient(
-                account_url = get_account_url(),
-                credential=azure_credential)
-
-            # Get file name to use in database
-            image_name = str(uuid.uuid4()) + ".png"
-            
-            # Create blob client
-            blob_client = blob_service_client.get_blob_client(container=STORAGE_CONTAINER_NAME, blob=image_name)
-            print("\nUploading to Azure Storage as blob:\n\t" + image_name)
-
-            # Upload file
-            blob_client.upload_blob(image_data)
-        else:
-            # No image for review
-            image_name=None
-
-        review = Review()
-        review.restaurant = id
-        review.review_date = datetime.now()
-        review.user_name = user_name
-        review.rating = int(rating)
-        review.review_text = review_text
-        review.image_name = image_name
-        db.session.add(review)
-        db.session.commit()
-                
-    return redirect(url_for('details', id=id))        
-"""
-
-
-
-
-
-########################### MITT EGET #################################
+########################### ERROR PAGES #################################
 @app.errorhandler(400)
 def bad_request(e):
     # Handles CSRF errors aswell.
@@ -172,8 +51,12 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('500.html'), 500
+#########################################################################
 
-
+########################### PAGES #################################
+@app.route('/about')
+def about():
+    return render_template('about.html', title='About')
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -304,7 +187,7 @@ def team(team, tag=None):
         following_list = current_user.followers
 
     return render_template('team.html',
-                           title=team,
+                           title=team.name,
                            post=paged_posts, 
                            post_form=form, 
                            team=team, 
@@ -315,9 +198,6 @@ def team(team, tag=None):
                            no_of_posts=no_of_posts,
                            image_path=get_image_path_no_name(app))
 
-@app.route('/about')
-def about():
-    return render_template('about.html', title='About')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -480,98 +360,6 @@ def post(post_id):
                            has_comments=has_comments,
                            image_path=get_image_path_no_name(app))
 
-
-
-@app.route('/post/<int:post_id>/update', methods=['POST'])
-@login_required
-def update_post(post_id):
-    post = Post.query.get_or_404(post_id)
-
-    if post.user_id != current_user.id:
-        flash('try updating your own posts instead!', 'warning')
-        return redirect(url_for('home'))
-
-    if request.method == 'POST':
-        try:
-            post.title = request.form.get('title')
-            post.content = request.form.get('content')
-            post.date_edited = datetime.now(pytz.timezone('Europe/Stockholm'))
-            db.session.commit()
-            flash('Your post has been updated!', 'success')
-            return jsonify({"status": "success",
-                            "date": post.date_edited})
-        except Exception as e:
-            # Rollback the transaction if there's an error
-            db.session.rollback()
-            flash(f'An error occurred: {str(e)}', 'danger')
-    else:
-        flash('Something went wrong when updating the post.', 'danger')
-        return jsonify({"status": "error", "message": "Post not found"}), 404
-
-
-
-@app.route('/post/<int:post_id>/delete', methods=['GET', 'POST'])
-@login_required
-def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    comments = Comment.query.filter_by(post_id=post.id).all()
-    if post.user_id != current_user.id:
-        flash('Try deleting your own posts instead!', 'warning')
-        return redirect(url_for('home'))
-    
-    try:
-        for c in comments:
-            db.session.delete(c)
-        db.session.delete(post)
-        db.session.commit()
-        flash('The post and all its comments have been deleted!', 'success')
-    except Exception as e:
-        # Rollback the transaction if there's an error
-        db.session.rollback()
-        flash(f'An error occurred: {str(e)}', 'danger')
-    return redirect(url_for('home'))
-
-
-@app.route('/post/<int:post_id>/comment/<string:username>', methods=['GET', 'POST'])
-@login_required
-def comment_post(post_id, username):
-
-    if request.method == 'POST':
-        try:
-            post = Post.query.get_or_404(post_id)
-            user = User.query.filter_by(username=username).first()
-            
-            if (post.is_locked() and (current_user.team_name != post.team_name)):
-                flash('This comment is locked for supporters only.', 'warning')
-                return jsonify({"status": "success"})
-
-            if request.form.get('parent_comment_id'):
-                p_id = request.form.get('parent_comment_id')
-                parent = Comment.query.get_or_404(p_id)
-
-                
-                comment = Comment(content=request.form.get('content'),
-                            post_id=post_id,
-                            user_id=user.id,
-                            parent=parent)
-            else:
-                comment = Comment(content=request.form.get('content'),
-                                post_id=post_id,
-                                user_id=user.id)
-            
-            db.session.add(comment)
-            db.session.commit()
-            flash('Your comment has been posted!', 'success')
-        except Exception as e:
-            # Rollback the transaction if there's an error
-            db.session.rollback()
-            flash(f'An error occurred: {str(e)}', 'danger')
-    else:
-        flash('There was an error posting your comment.', 'danger')
-    
-    return jsonify({"status": "success"})
-
-
 @app.route('/post/<int:post_id>/comment/delete/<int:comment_id>', methods=['GET', 'POST'])
 @login_required
 def comment_delete(post_id, comment_id):
@@ -594,44 +382,6 @@ def comment_delete(post_id, comment_id):
         flash(f'An error occurred: {str(e)}', 'danger')
     return redirect(url_for('post', post_id=post_id))
 
-
-@app.route('/like/post/<int:post_id>/<action>')
-@login_required
-def like_post_action(post_id, action):
-    try:
-        post = Post.query.filter_by(id=post_id).first_or_404()
-        if action == 'like':
-            current_user.like_post(post)
-            db.session.commit()
-
-        if action == 'unlike':
-            current_user.unlike_post(post)
-            db.session.commit()
-    except Exception as e:
-        # Rollback the transaction if there's an error
-        db.session.rollback()
-        flash(f'An error occurred: {str(e)}', 'danger')
-
-    return jsonify({'like_count': post.likes.count()}, 
-                   {'has_liked': current_user.has_liked_post(post)})
-
-@app.route('/like/comment/<int:comment_id>/<action>')
-@login_required
-def like_comment_action(comment_id, action):
-    try:
-        comment = Comment.query.filter_by(id=comment_id).first_or_404()
-        if action == 'like':
-            current_user.like_comment(comment)
-            db.session.commit()
-        if action == 'unlike':
-            current_user.unlike_comment(comment)
-            db.session.commit()
-    except Exception as e:
-        # Rollback the transaction if there's an error
-        db.session.rollback()
-        flash(f'An error occurred: {str(e)}', 'danger')
-    return jsonify({'like_count': comment.likes.count()}, 
-                   {'has_liked': current_user.has_liked_comment(comment)})
 
 
 @app.route('/follow/<int:user_id>')
@@ -727,27 +477,137 @@ def reset_token(token):
             db.session.rollback()
             flash(f'An error occurred: {str(e)}', 'danger')
     return render_template('reset_token.html', title='Reset Password', form=form)
-
-
-########################### SLUT PÅ MITT EGET #################################
-
+#########################################################################
 
 
 
 
+########################### AJAX ROUTES #################################
+@app.route('/post/<int:post_id>/update', methods=['POST'])
+@login_required
+def update_post(post_id):
+    post = Post.query.get_or_404(post_id)
+
+    if post.user_id != current_user.id:
+        flash('try updating your own posts instead!', 'warning')
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        try:
+            post.title = request.form.get('title')
+            post.content = request.form.get('content')
+            post.date_edited = datetime.now(pytz.timezone('Europe/Stockholm'))
+            db.session.commit()
+            flash('Your post has been updated!', 'success')
+            return jsonify({"status": "success",
+                            "date": post.date_edited})
+        except Exception as e:
+            # Rollback the transaction if there's an error
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+    else:
+        flash('Something went wrong when updating the post.', 'danger')
+        return jsonify({"status": "error", "message": "Post not found"}), 404
 
 
 
+@app.route('/post/<int:post_id>/delete', methods=['GET', 'POST'])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    comments = Comment.query.filter_by(post_id=post.id).all()
+    if post.user_id != current_user.id:
+        flash('Try deleting your own posts instead!', 'warning')
+        return redirect(url_for('home'))
+    
+    try:
+        for c in comments:
+            db.session.delete(c)
+        db.session.delete(post)
+        db.session.commit()
+        flash('The post and all its comments have been deleted!', 'success')
+    except Exception as e:
+        # Rollback the transaction if there's an error
+        db.session.rollback()
+        flash(f'An error occurred: {str(e)}', 'danger')
+    return redirect(url_for('home'))
 
 
+@app.route('/post/<int:post_id>/comment/<string:username>', methods=['GET', 'POST'])
+@login_required
+def comment_post(post_id, username):
+
+    if request.method == 'POST':
+        try:
+            post = Post.query.get_or_404(post_id)
+            user = User.query.filter_by(username=username).first()
+            
+            if (post.is_locked() and (current_user.team_name != post.team_name)):
+                flash('This comment is locked for supporters only.', 'warning')
+                return jsonify({"status": "success"})
+
+            if request.form.get('parent_comment_id'):
+                p_id = request.form.get('parent_comment_id')
+                parent = Comment.query.get_or_404(p_id)
+
+                
+                comment = Comment(content=request.form.get('content'),
+                            post_id=post_id,
+                            user_id=user.id,
+                            parent=parent)
+            else:
+                comment = Comment(content=request.form.get('content'),
+                                post_id=post_id,
+                                user_id=user.id)
+            
+            db.session.add(comment)
+            db.session.commit()
+            flash('Your comment has been posted!', 'success')
+        except Exception as e:
+            # Rollback the transaction if there's an error
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+    else:
+        flash('There was an error posting your comment.', 'danger')
+    
+    return jsonify({"status": "success"})
 
 
+@app.route('/like/post/<int:post_id>/<action>')
+@login_required
+def like_post_action(post_id, action):
+    try:
+        post = Post.query.filter_by(id=post_id).first_or_404()
+        if action == 'like':
+            current_user.like_post(post)
+            db.session.commit()
 
+        if action == 'unlike':
+            current_user.unlike_post(post)
+            db.session.commit()
+    except Exception as e:
+        # Rollback the transaction if there's an error
+        db.session.rollback()
+        flash(f'An error occurred: {str(e)}', 'danger')
 
+    return jsonify({'like_count': post.likes.count()}, 
+                   {'has_liked': current_user.has_liked_post(post)})
 
-
-
-
-
-
-
+@app.route('/like/comment/<int:comment_id>/<action>')
+@login_required
+def like_comment_action(comment_id, action):
+    try:
+        comment = Comment.query.filter_by(id=comment_id).first_or_404()
+        if action == 'like':
+            current_user.like_comment(comment)
+            db.session.commit()
+        if action == 'unlike':
+            current_user.unlike_comment(comment)
+            db.session.commit()
+    except Exception as e:
+        # Rollback the transaction if there's an error
+        db.session.rollback()
+        flash(f'An error occurred: {str(e)}', 'danger')
+    return jsonify({'like_count': comment.likes.count()}, 
+                   {'has_liked': current_user.has_liked_comment(comment)})
+#########################################################################
