@@ -54,10 +54,6 @@ def internal_server_error(e):
 #########################################################################
 
 ########################### PAGES #################################
-@app.route('/about')
-def about():
-    return render_template('about.html', title='About')
-
 @app.route('/', methods=['GET', 'POST'])
 def home():
     query = Post.query
@@ -261,7 +257,7 @@ def login():
                            form=form,
                            most_liked_posts=most_liked_posts)
 
-@app.route('/logout') 
+@app.route('/logout')
 @login_required
 def logout():
     logout_user()
@@ -426,7 +422,7 @@ def user_posts(username):
             Post.user_id == user.id
         ).group_by(Post.id).order_by(db.func.count(PostLike.id).desc()).limit(5).all()
     
-        following_list = user.followers
+        following_list = current_user.followers
         is_following = current_user.is_following(user)
     
     return render_template('user_posts.html',

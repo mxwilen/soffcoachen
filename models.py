@@ -145,6 +145,12 @@ class User(db.Model, UserMixin):
     def is_followed_by(self, user):
         return user in self.followed
     
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email
+        }
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
@@ -174,6 +180,20 @@ class Post(db.Model):
 
     def is_locked(self):
         return self.locked
+    
+    def to_dict(self):
+        return {
+            'title': self.title,
+            'content': self.content,
+            'id': self.id,
+            'date_posted': self.date_posted,
+            'no_of_likes': str(self.likes.count()),
+            'team': self.team_name,
+            'tag': self.tag,
+            'author': self.author.username,
+            'user_id': self.user_id,
+            'user_team': self.author.team_name
+        }
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.user_id}', '{self.date_posted}')"
@@ -199,6 +219,12 @@ class Team(db.Model):
 
     def set_logo(self):
         return os.path.join(app.root_path, 'static', 'team-logos', self.abr + '.png')
+    
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'abr': self.abr
+        }
 
     def __repr__(self):
         return f'<Team {self.name}>'
@@ -217,6 +243,16 @@ class Comment(db.Model):
 
     parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=True)
     replies = db.relationship('Comment', backref=db.backref('parent', remote_side=[id]), lazy='dynamic')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'content': self.content,
+            'date_commented': self.date_commented,
+            'author': self.author.username,
+            'author_team': self.author.team_name,
+            'no_of_likes': str(self.likes.count())
+        }
 
     def __repr__(self):
         return f"Comment('{self.id}', made by user: '{self.user_id}', on: '{self.date_commented}')"

@@ -11,7 +11,7 @@ from azureproject.get_conn import get_conn
 
 from routes import init_blueprints
 
-app = Flask(__name__, template_folder='templates', static_folder='static')
+app = Flask(__name__, template_folder='templates/', static_folder='static')
 
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['MAIL_SERVER'] = 'smtp.googlemail.com'

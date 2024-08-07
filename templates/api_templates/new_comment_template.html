@@ -1,0 +1,22 @@
+<div class="modal-body">
+    <form method="POST" action="">
+        {{ comment_form.hidden_tag() }}
+        <div class="form-group">
+            {{ comment_form.content.label(class="form-control-label") }}
+
+            {% if comment_form.content.errors %}
+                {{ comment_form.content(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in comment_form.content.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ comment_form.content(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ comment_form.submit(class="btn btn-outline-success") }}
+        </div>
+    </form>
+</div>
