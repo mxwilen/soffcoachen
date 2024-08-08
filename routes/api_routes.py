@@ -26,10 +26,16 @@ def api_home():
     following_list = []
     if current_user.is_authenticated:
         following_list = current_user.followers
+
+    if current_user.is_authenticated:
+        cur_usr = current_user.username
+    else:
+        cur_usr = "not_auth"
     
-    return jsonify({"status": "success",
-                    "teams": teams,
-                    "posts": posts})
+    return jsonify({'status': "success",
+                    'teams': teams,
+                    'posts': posts,
+                    'current_user': cur_usr})
 
 @app.route('/api/login', methods=['GET', 'POST']) 
 def api_login():
@@ -190,8 +196,9 @@ def api_like_post_action():
             current_user.like_post(post)
             db.session.commit()
 
-        return jsonify({'like_count': str(post.likes.count())}, 
-                   {'has_liked': current_user.has_liked_post(post)})
+        return jsonify({'status': "like_post_success",
+                        'like_count': str(post.likes.count()), 
+                        'has_liked': current_user.has_liked_post(post)})
     
     except Exception as e:
         # Rollback the transaction if there's an error
@@ -215,12 +222,42 @@ def api_like_comment_action():
             current_user.like_comment(comment)
             db.session.commit()
         
-        return jsonify({'like_count': str(comment.likes.count())}, 
-                   {'has_liked': current_user.has_liked_comment(comment)})
+        return jsonify({'status': "like_comment_success",
+                        'like_count': str(comment.likes.count()),
+                        'has_liked': current_user.has_liked_comment(comment)})
 
     except Exception as e:
         # Rollback the transaction if there's an error
         db.session.rollback()
         flash(f'An error occurred: {str(e)}', 'danger')
         return jsonify({'status': str(e)})
+    
+
+@app.route('/api/user')
+def api_user_posts():
+    username = request.args.get('username')
+
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = Post.query.filter_by(author=user)
+    ordered_posts = posts.order_by(Post.date_posted.desc())
+
+    posts = [(post.to_dict()) for post in ordered_posts]
+        
+    no_of_user_comments = user.comment_count()
+    no_of_recieved_likes = user.recieved_likes_count()
+    no_of_followers = len(user.followed)
+
+    is_following = False
+
+    if current_user.is_authenticated:
+        is_following = current_user.is_following(user)
+
+    return jsonify({'title': f"{username}'s posts",
+                    'user': user.to_dict(),
+                    'posts': posts,
+                    'no_of_user_comments': no_of_user_comments,
+                    'no_of_recieved_likes': no_of_recieved_likes,
+                    'no_of_followers': no_of_followers,
+                    'is_following': is_following})
+
     
