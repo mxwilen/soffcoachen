@@ -1,3 +1,6 @@
+{% extends "api_templates/api_layout.html" %}
+
+{% block content %}
 <div class="modal-body">
     <form method="POST" action="">
         {{ post_form.hidden_tag() }}
@@ -84,3 +87,4 @@
         </div>
     </form>
 </div>
+{% endblock content %}

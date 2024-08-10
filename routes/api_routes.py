@@ -44,14 +44,45 @@ def api_login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
+            
+            following_list = [(user.username) for user in user.followers]
             return jsonify({'status': "login_success",
                             'current_user': current_user.username,
-                            'cookie': "hej"})
+                            'following_list': following_list})
         else:
+            print("error during login")
             jsonify({"status": "error", "message": "Something went wrong"}), 404
 
-    return render_template('login.html',
+    return render_template('api_templates/api_login.html',
                            title='Login', 
+                           form=form)
+
+@app.route('/api/register', methods=['GET', 'POST'])
+def api_register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        try:
+            hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            user = User(username=form.username.data, 
+                        email=form.email.data, 
+                        team=Team.query.filter_by(name=form.team.data).first(),
+                        password=hashed_pw)
+            db.session.add(user)
+            db.session.commit()
+            login_user(user)
+            following_list = [(user.username) for user in user.followers]
+            return jsonify({'status': "register_success",
+                            'current_user': current_user.username,
+                            'following_list': following_list})
+        
+        except Exception as e:
+            # Rollback the transaction if there's an error
+            db.session.rollback()
+            print("error: ", str(e))
+            jsonify({"status": str(e)})
+
+    return render_template('api_templates/api_register.html', 
+                           title='Register', 
                            form=form)
 
 @app.route('/api/logout')
@@ -78,9 +109,10 @@ def api_new_post():
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
+            print("error: ", str(e))
             jsonify({"status": "error", "message": "Something went wrong"}), 404
 
-    return render_template('api_templates/new_post_template.html',
+    return render_template('api_templates/api_new_post_template.html',
                            post_form=post_form)
 
 @app.route('/api/new_comment', methods=['GET', 'POST'])
@@ -93,7 +125,6 @@ def api_new_comment():
             post = Post.query.get_or_404(post_id)
             
             if (post.is_locked() and (current_user.team_name != post.team_name)):
-                flash('This comment is locked for supporters only.', 'warning')
                 return jsonify({"status": "error. post is locked."})
             
             comment = Comment(content=comment_form.content.data,
@@ -106,10 +137,10 @@ def api_new_comment():
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
-            flash(f'An error occurred: {str(e)}', 'danger')
+            print("error: ", str(e))
             jsonify({"status": str(e)})
 
-    return render_template('api_templates/new_comment_template.html',
+    return render_template('api_templates/api_new_comment_template.html',
                            comment_form=comment_form)
 
 @app.route('/api/account', methods=['GET', 'POST'])
@@ -142,7 +173,8 @@ def api_account():
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
-            flash(f'An error occurred: {str(e)}', 'danger')
+            print("error: ", str(e))
+
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email
@@ -154,7 +186,7 @@ def api_account():
     if current_user.is_authenticated:
         following_list = current_user.followers
 
-    return render_template('account.html', 
+    return render_template('api_templates/api_account.html', 
                            title='Account', 
                            form=form,
                            following_list=following_list,
@@ -203,7 +235,7 @@ def api_like_post_action():
     except Exception as e:
         # Rollback the transaction if there's an error
         db.session.rollback()
-        flash(f'An error occurred: {str(e)}', 'danger')
+        print("error: ", str(e))
         return jsonify({'status': str(e)})
 
 @app.route('/api/like/comment/')
@@ -229,7 +261,7 @@ def api_like_comment_action():
     except Exception as e:
         # Rollback the transaction if there's an error
         db.session.rollback()
-        flash(f'An error occurred: {str(e)}', 'danger')
+        print("error: ", str(e))
         return jsonify({'status': str(e)})
     
 
@@ -247,17 +279,38 @@ def api_user_posts():
     no_of_recieved_likes = user.recieved_likes_count()
     no_of_followers = len(user.followed)
 
-    is_following = False
-
-    if current_user.is_authenticated:
-        is_following = current_user.is_following(user)
-
     return jsonify({'title': f"{username}'s posts",
-                    'user': user.to_dict(),
+                    'user_team': user.team_name,
                     'posts': posts,
-                    'no_of_user_comments': no_of_user_comments,
-                    'no_of_recieved_likes': no_of_recieved_likes,
-                    'no_of_followers': no_of_followers,
-                    'is_following': is_following})
+                    'no_of_user_comments': str(no_of_user_comments),
+                    'no_of_recieved_likes': str(no_of_recieved_likes),
+                    'no_of_followers': str(no_of_followers)})
 
+@app.route('/api/follow')
+@login_required
+def api_follow_user():
+    username = request.args.get('username')
+    try:
+        user = User.query.filter_by(username=username).first_or_404()
+        if current_user == user:
+            return jsonify({'status': "Error: Cannot follow yourself!"})
+        
+        if current_user.is_following(user):
+            print("un-following user", user.username)
+            current_user.unfollow(user)
+        else:
+            print("following user", user.username)
+            current_user.follow(user)
+        db.session.commit()
+
+        if current_user.is_authenticated:
+            is_following = current_user.is_following(user)
+
+        return jsonify({'status': "follow_user_success",
+                        'is_following': is_following})
     
+    except Exception as e:
+        # Rollback the transaction if there's an error
+        db.session.rollback()
+        print("error: ", str(e))
+        return jsonify({'status': str(e)})
