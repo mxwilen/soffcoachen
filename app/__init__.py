@@ -11,7 +11,7 @@ from azureproject.get_conn import get_conn
 
 from routes import init_blueprints
 
-app = Flask(__name__, template_folder='templates/', static_folder='static')
+app = Flask(__name__, template_folder='../templates/', static_folder='../static')
 
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
@@ -79,7 +79,7 @@ with app.app_context():
     # generate_teams(db)
     # generate_dummy(db)
     
-    from models import Team
+    from .models import Team
     teams = [(team.name) for team in Team.query.all()]
 
 init_blueprints(app)

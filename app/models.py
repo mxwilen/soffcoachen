@@ -7,7 +7,7 @@ from sqlalchemy import Column, Integer, ForeignKey, Table, Column
 from sqlalchemy.orm import validates
 from flask_login import UserMixin
 
-from app import db, login_manager, app
+from . import db, login_manager, app
 
 @login_manager.user_loader
 def load_user(user_id):

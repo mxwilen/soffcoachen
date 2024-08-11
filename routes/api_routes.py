@@ -4,9 +4,8 @@ from flask import Blueprint
 from flask.json import jsonify
 from datetime import datetime, timedelta
 
-# from models import Restaurant, Review
-from models import User, Post, Comment, Team, PostLike
-from forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, RequestResetForm, ResetPasswordForm, CommentForm, UpdatePostForm, SearchPostsForm
+from app.models import User, Post, Comment, Team, PostLike
+from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, RequestResetForm, ResetPasswordForm, CommentForm, UpdatePostForm, SearchPostsForm
 from app import app, db, bcrypt, tags
 from flask_login import login_user, current_user, logout_user, login_required
 

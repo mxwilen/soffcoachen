@@ -1,4 +1,4 @@
-from models import User, Post, Team, Comment
+from app.models import User, Post, Team, Comment
 from app import bcrypt
 
 def generate_teams(db):

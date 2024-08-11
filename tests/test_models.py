@@ -1,6 +1,6 @@
 import unittest
 from app import app, db
-from models import User, Post, Team, Comment, PostLike, CommentLike
+from app.models import User, Post, Team, Comment, PostLike, CommentLike
 from dummy_data import generate_dummy, generate_teams
 from sqlalchemy.exc import IntegrityError
 
