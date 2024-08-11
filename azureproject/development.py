@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
 
 if not 'AZURE_POSTGRESQL_CONNECTIONSTRING' in os.environ:
-    print("------- lokalt!!!! ----")
+    print("------- RUNNING LOCALLY: DB is set to local postgresql ----")
     # DATABASE_URI = f'sqlite:///site.db'
     
     DATABASE_URI = 'postgresql+psycopg2://localhost/maxwilen'
