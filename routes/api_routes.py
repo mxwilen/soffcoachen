@@ -50,7 +50,6 @@ def api_login():
                             'current_user': current_user.username,
                             'following_list': following_list})
         else:
-            print("error during login")
             jsonify({"status": "error", "message": "Something went wrong"}), 404
 
     return render_template('api_templates/api_login.html',
@@ -207,24 +206,20 @@ def api_post():
                     'has_comments': has_comments})
 
 @app.route('/api/like/post/')
-# @login_required
+@login_required
 def api_like_post_action():
     post_id = request.args.get('post_id')
 
     try:
-        print("user: ", current_user.username)
         if not current_user.is_authenticated:
-            print("not authenticated")
             return jsonify({'status': "error: user not logged in."})
         
         post = Post.query.filter_by(id=post_id).first_or_404()
         if current_user.has_liked_post(post):
-            print("un-liking post: ", post.id)
             current_user.unlike_post(post)
             db.session.commit()
 
         else:
-            print("liking post: ", post.id)
             current_user.like_post(post)
             db.session.commit()
 
@@ -239,18 +234,16 @@ def api_like_post_action():
         return jsonify({'status': str(e)})
 
 @app.route('/api/like/comment/')
-# @login_required
+@login_required
 def api_like_comment_action():
     comment_id = request.args.get('comment_id')
     
     try:
         comment = Comment.query.filter_by(id=comment_id).first_or_404()
         if current_user.has_liked_comment(comment):
-            print("un-liking comment: ", comment.id)
             current_user.unlike_comment(comment)
             db.session.commit()
         else:
-            print("liking comment: ", comment.id)
             current_user.like_comment(comment)
             db.session.commit()
         
@@ -296,10 +289,8 @@ def api_follow_user():
             return jsonify({'status': "Error: Cannot follow yourself!"})
         
         if current_user.is_following(user):
-            print("un-following user", user.username)
             current_user.unfollow(user)
         else:
-            print("following user", user.username)
             current_user.follow(user)
         db.session.commit()
 
