@@ -102,10 +102,16 @@ class User(db.Model, UserMixin):
 
     # Follow actions
     def follow(self, user):
+        if self == user:
+                raise ValueError("User cannot follow themselves.")
+        
         if not self.is_following(user):
             self.followers.append(user)
     
     def unfollow(self, user):
+        if self == user:
+                raise ValueError("User cannot unfollow themselves.")
+        
         if self.is_following(user):
             self.followers.remove(user)
     

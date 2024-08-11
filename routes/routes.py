@@ -64,7 +64,7 @@ def home():
         try:
             post = Post(title=post_form.title.data, 
                         content=post_form.content.data, 
-                        user_id=current_user.id,
+                        author=current_user,
                         team=Team.query.filter_by(name=post_form.team.data).first(),
                         tag=post_form.tag.data,
                         locked=post_form.locked.data)
@@ -152,7 +152,7 @@ def team(team, tag=None):
         try:
             post = Post(title=form.title.data, 
                         content=form.content.data, 
-                        user_id=current_user.id,
+                        author=current_user,
                         team=Team.query.filter_by(name=form.team.data).first(),
                         tag=form.tag.data,
                         locked=form.locked.data)
@@ -548,13 +548,13 @@ def comment_post(post_id, username):
 
                 
                 comment = Comment(content=request.form.get('content'),
-                            post_id=post_id,
-                            user_id=user.id,
+                            post=post,
+                            author=user,
                             parent=parent)
             else:
                 comment = Comment(content=request.form.get('content'),
-                                post_id=post_id,
-                                user_id=user.id)
+                                post=post,
+                                author=user)
             
             db.session.add(comment)
             db.session.commit()

@@ -38,7 +38,7 @@ with app.app_context():
 if 'SECRET_KEY' in os.environ:
     app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 else:
-    print("No SECRET_KEY found. Generating new!!!")
+    print("No SECRET_KEY found. Generating new.")
     app.config['SECRET_KEY'] = secrets.token_hex()
 
 
@@ -75,8 +75,9 @@ tags = [
 
 # The import must be done after db initialization due to circular import issue.
 with app.app_context():
-    from dummy_data import generate_dummy
-    # generate_dummy()
+    from dummy_data import generate_dummy, generate_teams
+    # generate_teams(db)
+    # generate_dummy(db)
     
     from models import Team
     teams = [(team.name) for team in Team.query.all()]
