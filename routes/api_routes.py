@@ -43,13 +43,13 @@ def api_login():
         user = User.query.filter_by(email=form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
-            
             following_list = [(user.username) for user in user.followers]
             return jsonify({'status': "login_success",
                             'current_user': current_user.username,
                             'following_list': following_list})
         else:
-            jsonify({"status": "error", "message": "Something went wrong"}), 404
+            return jsonify({"status": "error", 
+                            "message": "Credentials don't match"}), 400
 
     return render_template('api_templates/api_login.html',
                            title='Login', 
@@ -76,8 +76,8 @@ def api_register():
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
-            print("error: ", str(e))
-            jsonify({"status": str(e)})
+            return jsonify({"status": 'error', 
+                            "message": str(e)}), 400
 
     return render_template('api_templates/api_register.html', 
                            title='Register', 
@@ -107,8 +107,8 @@ def api_new_post():
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
-            print("error: ", str(e))
-            jsonify({"status": "error", "message": "Something went wrong"}), 404
+            return jsonify({"status": 'error', 
+                            "message": str(e)}), 400
 
     return render_template('api_templates/api_new_post_template.html',
                            post_form=post_form)
@@ -135,8 +135,8 @@ def api_new_comment():
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
-            print("error: ", str(e))
-            jsonify({"status": str(e)})
+            return jsonify({"status": 'error', 
+                            "message": str(e)})
 
     return render_template('api_templates/api_new_comment_template.html',
                            comment_form=comment_form)
@@ -171,7 +171,8 @@ def api_account():
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
-            print("error: ", str(e))
+            return jsonify({"status": 'error', 
+                            "message": str(e)})
 
     elif request.method == 'GET':
         form.username.data = current_user.username

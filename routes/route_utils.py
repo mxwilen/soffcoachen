@@ -6,7 +6,6 @@ from PIL import Image
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
-# from models import Restaurant, Review
 from flask_login import current_user
 from flask_mail import Message
 

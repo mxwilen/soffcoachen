@@ -1,8 +1,10 @@
 import unittest
-from app import app, db
+from app import app, db, bcrypt
 from app.models import User, Post, Team, Comment, PostLike, CommentLike
 from dummy_data import generate_dummy, generate_teams
 from sqlalchemy.exc import IntegrityError
+
+pw = bcrypt.generate_password_hash('pw').decode('utf-8')
 
 class ModelsTestCase(unittest.TestCase):
 
@@ -14,14 +16,14 @@ class ModelsTestCase(unittest.TestCase):
         cls.client = cls.app.test_client()
 
         with cls.app.app_context():
-            print("--- TESTING MODELS ---")
+            print("\n--- TESTING MODELS ---")
             generate_teams(db) # includes db.drop_all() and db.create_all()
             generate_dummy(db)
 
     @classmethod
     def tearDownClass(cls):
         with cls.app.app_context():
-            print("--- DONE TESTING MODELS ---")
+            print("\n--- DONE TESTING MODELS ---")
             generate_teams(db) # includes db.drop_all() and db.create_all()
 
     def test_user_model(self):
@@ -29,7 +31,7 @@ class ModelsTestCase(unittest.TestCase):
             try:
                 user1 = User(username='testuser', 
                              email='test@example.com', 
-                             password='password')
+                             password=pw)
                 db.session.add(user1)
                 db.session.commit()
                 # print("Testing User model: Successfully added user")
@@ -46,7 +48,7 @@ class ModelsTestCase(unittest.TestCase):
                 # Attempt to create a second user with the same username
                 user2 = User(username="testuser", 
                             email="test2@example.com", 
-                            password="password")
+                            password=pw)
                 db.session.add(user2)
                 db.session.commit()
 
@@ -58,7 +60,7 @@ class ModelsTestCase(unittest.TestCase):
             try:
                 user1 = User(username='testpost', 
                                 email='test_post@example.com', 
-                                password='password')
+                                password=pw)
                 db.session.add(user1)
                 db.session.commit()
             except Exception as e:
@@ -88,7 +90,7 @@ class ModelsTestCase(unittest.TestCase):
             with self.assertRaises(IntegrityError):
                 duplicate_user = User(username='testpost', 
                                     email='test_post@example.com', 
-                                    password='password')
+                                    password=pw)
                 db.session.add(duplicate_user)
                 db.session.commit()
 
@@ -119,7 +121,7 @@ class ModelsTestCase(unittest.TestCase):
             try:
                 user1 = User(username='testcomment', 
                              email='test_comment@example.com', 
-                             password='password')
+                             password=pw)
                 db.session.add(user1)
                 db.session.commit()
                 # print("Testing Comment model: Successfully added user")
@@ -185,7 +187,7 @@ class ModelsTestCase(unittest.TestCase):
             try:
                 user1 = User(username='testlikemodel', 
                              email='test_like_model@example.com', 
-                             password='password')
+                             password=pw)
                 db.session.add(user1)
                 db.session.commit()
             except Exception as e:
@@ -224,7 +226,7 @@ class ModelsTestCase(unittest.TestCase):
             try:
                 user1 = User(username='testcommentlike', 
                              email='test_comment_like@example.com', 
-                             password='password')
+                             password=pw)
                 db.session.add(user1)
                 db.session.commit()
             except Exception as e:
@@ -273,7 +275,7 @@ class ModelsTestCase(unittest.TestCase):
             try:
                 user1 = User(username='testfollow1', 
                              email='test_follow1@example.com', 
-                             password='password')
+                             password=pw)
                 db.session.add(user1)
                 db.session.commit()
             except Exception as e:
@@ -283,7 +285,7 @@ class ModelsTestCase(unittest.TestCase):
             try:
                 user2 = User(username='testfollow2', 
                              email='test_follow2@example.com', 
-                             password='password')
+                             password=pw)
                 db.session.add(user2)
                 db.session.commit()
             except Exception as e:
