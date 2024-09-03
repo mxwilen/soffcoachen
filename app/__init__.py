@@ -80,6 +80,7 @@ with app.app_context():
     # generate_dummy(db)
     
     from .models import Team
+
     teams = [(team.name) for team in Team.query.all()]
 
 init_blueprints(app)

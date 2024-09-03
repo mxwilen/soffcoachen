@@ -10,6 +10,7 @@ def generate_teams(db):
     aik = Team(name='AIK', abr='aik', city='Stockholm')
     bkh = Team(name='BK Häcken', abr='bkh', city='Hissingen')
     dif = Team(name='Djurgårdens IF', abr='dif', city='Stockholm')
+    gais = Team(name='Gais', abr='gais', city='Göteborg')
     hbk = Team(name='Halmstad BK', abr='hbk', city='Halmstad')
     hif = Team(name='Hammarby IF', abr='hif', city='Stockholm')
     ifbp = Team(name='IF Brommapojkarna', abr='ifbp', city='Stockholm')
@@ -23,7 +24,7 @@ def generate_teams(db):
     maif = Team(name='Mjälby AIF', abr='maif', city='Sölvesborg')
     vsk = Team(name='Västerås SK', abr='vsk', city='Västerås')
 
-    db.session.add_all([none, aik, bkh, dif, hbk, hif, ifbp, ife, ifkg, ifkn, ifkv, iks, kff, mff, maif, vsk])
+    db.session.add_all([none, aik, bkh, dif, gais, hbk, hif, ifbp, ife, ifkg, ifkn, ifkv, iks, kff, mff, maif, vsk])
     db.session.commit()
 
 def generate_dummy(db):
