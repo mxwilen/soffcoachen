@@ -4,7 +4,6 @@ from flask import Blueprint
 from flask.json import jsonify
 from datetime import datetime, timedelta
 
-# from models import Restaurant, Review
 from app.models import User, Post, Comment, Team, PostLike
 from app.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, RequestResetForm, ResetPasswordForm, CommentForm, UpdatePostForm, SearchPostsForm
 from app import app, db, bcrypt, tags
@@ -12,46 +11,6 @@ from flask_login import login_user, current_user, logout_user, login_required
 
 from routes.route_utils import get_image_path_no_name, save_picture, send_reset_email
 
-
-home_bp = Blueprint('home', __name__)
-team_bp = Blueprint('team', __name__)
-about_bp = Blueprint('about', __name__)
-register_bp = Blueprint('register', __name__)
-login_bp = Blueprint('login', __name__)
-logout_bp = Blueprint('logout', __name__)
-account_bp = Blueprint('account', __name__)
-post_bp = Blueprint('post', __name__)
-update_post_bp = Blueprint('update_post', __name__)
-delete_post_bp = Blueprint('delete_post', __name__)
-comment_post_bp = Blueprint('comment_post', __name__)
-comment_delete_bp = Blueprint('comment_delete', __name__)
-like_post_action_bp = Blueprint('like_post_action', __name__)
-like_comment_action_bp = Blueprint('like_comment_action', __name__)
-follow_user_bp = Blueprint('follow_user', __name__)
-user_posts_bp = Blueprint('user_posts', __name__)
-reset_request_bp = Blueprint('reset_request', __name__)
-reset_token_bp = Blueprint('reset_token', __name__)
-
-
-
-########################### ERROR PAGES #################################
-@app.errorhandler(400)
-def bad_request(e):
-    # Handles CSRF errors aswell.
-    return render_template('400.html'), 400
-
-@app.errorhandler(403)
-def forbidden(e):
-    return render_template('403.html'), 403
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500
-#########################################################################
 
 ########################### PAGES #################################
 @app.route('/', methods=['GET', 'POST'])

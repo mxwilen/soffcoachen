@@ -4,7 +4,6 @@ import os
 
 from flask import Blueprint
 
-
 def init_blueprints(app):
     package_dir = os.path.dirname(__file__)
     for _, module_name, _ in pkgutil.iter_modules([package_dir]):

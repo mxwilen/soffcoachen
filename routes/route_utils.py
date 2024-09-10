@@ -23,7 +23,6 @@ def get_account_url(app):
         if 'WEBSITE_HOSTNAME' in os.environ or ("LOCAL_USE_AZURE_STORAGE" in os.environ):
             return "https://%s.blob.core.windows.net" % os.environ['STORAGE_ACCOUNT_NAME']
         else:
-            print("Using LOCAL storage.")
             return os.path.join(app.root_path, 'local-storage-container')
     else:
         return os.environ['AZURE_STORAGEBLOB_RESOURCEENDPOINT'].rstrip('/')
