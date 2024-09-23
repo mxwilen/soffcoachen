@@ -320,6 +320,13 @@ def post(post_id):
 def comment_delete(post_id, comment_id):
     try:
         comment = Comment.query.get_or_404(comment_id)
+        if current_user.role == 'admin':
+            # ONLY FOR ADMIN. This stays segregated for sec. purposes.
+            db.session.delete(comment)
+            db.session.commit()
+            flash(f'Comment has been deleted by admin: {current_user.username}', 'success')
+            return redirect(url_for('post', post_id=post_id))
+
         if comment.user_id != current_user.id:
             flash('Error: try deleting your own comments instead!', 'warning')
             return redirect(url_for('home'))
@@ -471,7 +478,8 @@ def update_post(post_id):
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
     comments = Comment.query.filter_by(post_id=post.id).all()
-    if post.user_id != current_user.id:
+    
+    if post.user_id != current_user.id and current_user.role != 'admin':
         flash('Try deleting your own posts instead!', 'warning')
         return redirect(url_for('home'))
     

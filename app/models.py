@@ -23,6 +23,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     date_created = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(pytz.timezone('Europe/Stockholm')))
 
+    role = db.Column(db.String(10), nullable=False, default='user')
+
     # team = db.Column(db.String(20), nullable=True)
     team_name = db.Column(db.String(50), db.ForeignKey('team.name'), nullable=True)
     team = db.relationship('Team', backref='members', lazy=True)

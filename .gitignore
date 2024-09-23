@@ -2,6 +2,7 @@ local-storage-container/
 .azure
 htmlcov
 .DS_Store
+dummy_data.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
