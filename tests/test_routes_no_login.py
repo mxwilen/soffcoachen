@@ -73,7 +73,7 @@ class RoutesNoLogin(unittest.TestCase):
         self.assertEqual(response.status_code, 308)
 
     def test_user_posts_page(self):
-        response = self.client.get('/api/user?username=user1')
+        response = self.client.get('/api/user?username=max')
         self.assertEqual(response.status_code, 200)
 
     def test_follow_page(self):

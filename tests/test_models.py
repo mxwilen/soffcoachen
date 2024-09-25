@@ -105,16 +105,17 @@ class ModelsTestCase(unittest.TestCase):
             self.assertEqual(retrieved_team.city, 'Stockholm')
             self.assertEqual(retrieved_team.abr, 'aik')
 
-            # Attempt to create a second user with the same username or email
-            with self.assertRaises(IntegrityError):
-                duplicate_team = Team(name='AIK', 
-                                      abr='aik', 
-                                      city='Stockholm')
+            # Attempt to create a duplication of the team
+            try:
+                duplicate_team = Team(name='AIK', abr='aik', city='Stockholm')
                 db.session.add(duplicate_team)
                 db.session.commit()
-
-            # Ensure session is clean after testing
-            db.session.rollback()
+                self.fail('IntegrityError not raised')  # Fail if no error
+            except IntegrityError:
+                print("SUCESS. Duplicate Team not added. db is rolled back.")
+                db.session.rollback()  # Rollback the session after IntegrityError
+            except Exception as e:
+                self.fail(f'Unexpected exception raised: {e}')
     
     def test_comment_model(self):
         with self.app.app_context():
