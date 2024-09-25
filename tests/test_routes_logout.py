@@ -27,6 +27,7 @@ class RegisterTestCase(unittest.TestCase):
         with cls.app.app_context():
             print("\n--- SUCCESS TESTING REGISTER ROUTES ---")
             generate_teams(db) # includes db.drop_all() and db.create_all()
+            generate_dummy(db)
 
     def test_logout_success(self):
         # POST request to logout while being logged in

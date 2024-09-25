@@ -25,6 +25,7 @@ class ModelsTestCase(unittest.TestCase):
         with cls.app.app_context():
             print("\n--- DONE TESTING MODELS ---")
             generate_teams(db) # includes db.drop_all() and db.create_all()
+            generate_dummy(db)
 
     def test_user_model(self):
         with self.app.app_context():

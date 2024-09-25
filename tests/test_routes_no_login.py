@@ -24,6 +24,7 @@ class RoutesNoLogin(unittest.TestCase):
         with cls.app.app_context():
             print("\n--- SUCCESS TESTING ROUTES (no login) ---")
             generate_teams(db) # includes db.drop_all() and db.create_all()
+            generate_dummy(db)
 
 
     def test_home_page(self):

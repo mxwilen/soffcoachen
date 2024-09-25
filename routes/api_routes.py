@@ -13,6 +13,7 @@ from routes.route_utils import get_image_path_no_name, save_picture, send_reset_
 
 
 ########################### API PAGES #################################
+""" Home route for fetching unanuthorized data. """
 @app.route('/api/home')
 def api_home():
     query = Post.query
@@ -21,10 +22,6 @@ def api_home():
 
     # The list of teams used to print the logos on the frontpage.
     teams = [(team.to_dict()) for team in Team.query.all() if team.logo]
-
-    following_list = []
-    if current_user.is_authenticated:
-        following_list = current_user.followers
 
     if current_user.is_authenticated:
         cur_usr = current_user.username
@@ -36,6 +33,9 @@ def api_home():
                     'posts': posts,
                     'current_user': cur_usr})
 
+""" 
+Route for logging in. Session cookie is stored in browser and therefor no need for a JWT token auth. 
+"""
 @app.route('/api/login', methods=['GET', 'POST']) 
 def api_login():
     form = LoginForm()
@@ -55,6 +55,9 @@ def api_login():
                            title='Login', 
                            form=form)
 
+"""
+Route for registrering. stores the hashed password and authenticates the user. No need for user to login following a registration. 
+"""
 @app.route('/api/register', methods=['GET', 'POST'])
 def api_register():
     form = RegistrationForm()
@@ -89,6 +92,10 @@ def api_logout():
     logout_user()
     return jsonify({'status': "logout_success"})
 
+"""
+GET: Responds with the correct html and its form.
+POST: tries to create a new post with the form data.
+"""
 @app.route('/api/new_post', methods=['GET', 'POST'])
 @login_required
 def api_new_post():
@@ -113,6 +120,10 @@ def api_new_post():
     return render_template('api_templates/api_new_post_template.html',
                            post_form=post_form)
 
+"""
+GET: Responds with the correct html and its form.
+POST: tries to create a new comment with the form data.
+"""
 @app.route('/api/new_comment', methods=['GET', 'POST'])
 @login_required
 def api_new_comment():
@@ -141,6 +152,10 @@ def api_new_comment():
     return render_template('api_templates/api_new_comment_template.html',
                            comment_form=comment_form)
 
+"""
+GET: Responds with the data for the authenticated user and form for updating.
+POST: tries to update user data with the data from the form.
+"""
 @app.route('/api/account', methods=['GET', 'POST'])
 @login_required
 def api_account():
@@ -148,8 +163,10 @@ def api_account():
     if form.validate_on_submit():
         try:
             if form.picture.data:
+                pass
+                # NOT USED ATM:
                 # Save pictures flashes error if image-file is too big.
-                current_user.image_file = save_picture(app, form.picture.data)
+                # current_user.image_file = save_picture(app, form.picture.data)
             
             if form.team.data:
                 team_instance = Team.query.filter_by(name=form.team.data).first()
@@ -191,6 +208,9 @@ def api_account():
                            following_list=following_list,
                            image_path=get_image_path_no_name(app))
 
+"""
+Responds with the data for a requested post.
+"""
 @app.route('/api/post')
 def api_post():
     post_id = request.args.get('post_id')
@@ -205,6 +225,33 @@ def api_post():
                     'comments': comments,
                     'has_comments': has_comments})
 
+"""
+Responds with the public data for a user. No need to be authenticated (i.e. any users data can be grabbed).
+"""
+@app.route('/api/user')
+def api_user_posts():
+    username = request.args.get('username')
+
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = Post.query.filter_by(author=user)
+    ordered_posts = posts.order_by(Post.date_posted.desc())
+
+    posts = [(post.to_dict()) for post in ordered_posts]
+        
+    no_of_user_comments = user.comment_count()
+    no_of_recieved_likes = user.recieved_likes_count()
+    no_of_followers = len(user.followed)
+
+    return jsonify({'title': f"{username}'s posts",
+                    'user_team': user.team_name,
+                    'posts': posts,
+                    'no_of_user_comments': str(no_of_user_comments),
+                    'no_of_recieved_likes': str(no_of_recieved_likes),
+                    'no_of_followers': str(no_of_followers)})
+
+"""
+Tries to like a post given its post_id and the current authenticated user.
+"""
 @app.route('/api/like/post/')
 @login_required
 def api_like_post_action():
@@ -233,6 +280,9 @@ def api_like_post_action():
         print("error: ", str(e))
         return jsonify({'status': str(e)})
 
+"""
+Tries to like a comment given its post_id and the current authenticated user.
+"""
 @app.route('/api/like/comment/')
 @login_required
 def api_like_comment_action():
@@ -256,29 +306,10 @@ def api_like_comment_action():
         db.session.rollback()
         print("error: ", str(e))
         return jsonify({'status': str(e)})
-    
 
-@app.route('/api/user')
-def api_user_posts():
-    username = request.args.get('username')
-
-    user = User.query.filter_by(username=username).first_or_404()
-    posts = Post.query.filter_by(author=user)
-    ordered_posts = posts.order_by(Post.date_posted.desc())
-
-    posts = [(post.to_dict()) for post in ordered_posts]
-        
-    no_of_user_comments = user.comment_count()
-    no_of_recieved_likes = user.recieved_likes_count()
-    no_of_followers = len(user.followed)
-
-    return jsonify({'title': f"{username}'s posts",
-                    'user_team': user.team_name,
-                    'posts': posts,
-                    'no_of_user_comments': str(no_of_user_comments),
-                    'no_of_recieved_likes': str(no_of_recieved_likes),
-                    'no_of_followers': str(no_of_followers)})
-
+"""
+Tries to follow another user given its username and the current authenticated user.
+"""
 @app.route('/api/follow')
 @login_required
 def api_follow_user():

@@ -34,6 +34,7 @@ class LoginTestCase(unittest.TestCase):
         with cls.app.app_context():
             print("\n--- SUCCESS TESTING LOGIN ROUTES ---")
             generate_teams(db) # includes db.drop_all() and db.create_all()
+            generate_dummy(db)
 
     def test_login_success(self):
         # POST request to login
