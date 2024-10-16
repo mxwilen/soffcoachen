@@ -92,8 +92,21 @@
                 <div class="col-md-4">
 
                     <div class="content-section">
-                        <h5 class="text-center">Following</h5>
+                        <h5 class="text-center">Most liked posts</h5>
                         {% if most_liked_posts is not none %}
+                        {% for post in most_liked_posts %}
+                        <article class="media content-section">
+                            <div class="media-body">
+                                {% include 'small_post_template.html' %}
+                            </div>
+                        </article>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    {% if current_user.is_authenticated %}
+                    <div class="content-section">
+                        <h5 class="text-center">Followed accounts</h5>
                         {% for user in following_list %}
                         <article class="media content-section">
                             <div class="media-body">
@@ -118,21 +131,8 @@
                             </div>
                         </article>
                         {% endfor %}
-                        {% endif %}
                     </div>
-
-                    <div class="content-section">
-                        <h5 class="text-center">Most liked posts</h5>
-                        {% if most_liked_posts is not none %}
-                        {% for post in most_liked_posts %}
-                        <article class="media content-section">
-                            <div class="media-body">
-                                {% include 'small_post_template.html' %}
-                            </div>
-                        </article>
-                        {% endfor %}
-                        {% endif %}
-                    </div>
+                    {% endif %}
 
                 </div>
             </div>

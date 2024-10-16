@@ -41,6 +41,7 @@
 </div>
 
 
+{% if post.team.name != '-' %}
 {% if post.team or post.tag %}
 <nav class="mt-2" aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -66,6 +67,7 @@
         {% endif %}
     </ol>
 </nav>
+{% endif %}
 {% endif %}
 
 

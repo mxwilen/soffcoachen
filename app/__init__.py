@@ -75,8 +75,7 @@ tags = [
 
 # The import must be done after db initialization due to circular import issue.
 with app.app_context():
-    from dummy_data import generate_dummy, generate_teams
-    # generate_teams(db)
+    from dummy_data import generate_dummy
     # generate_dummy(db)
     
     from .models import Team

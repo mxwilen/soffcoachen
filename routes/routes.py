@@ -72,8 +72,9 @@ def home():
 
     most_liked_posts = db.session.query(Post).outerjoin(PostLike).filter(
         Post.date_posted >= today_start,
-        Post.date_posted < today_end
-    ).group_by(Post.id).order_by(db.func.count(PostLike.id).desc()).limit(5).all()
+        Post.date_posted < today_end,
+        PostLike.id.isnot(None)
+    ).group_by(Post.id).order_by(db.func.count(PostLike.id).desc()).limit(10).all()
 
     following_list = []
     if current_user.is_authenticated:
