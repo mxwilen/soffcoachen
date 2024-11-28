@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h1>429 - Rate limit exceeded</h1>
+<p>You have exceeded the number of login attempts. Please try again later.</p>
+<a href="{{ url_for('home') }}">Go to Home</a>
+
+{% endblock content %}

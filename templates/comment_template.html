@@ -1,0 +1,86 @@
+<article class="media content-section">
+    <div class="media-body">
+        <div class="article-metadata d-flex align-items-center">
+
+            <a href="{{image_path}}/{{comment.author.image_file}}">
+                <img class="mr-2 account-img-small rounded-circle" src="{{image_path}}/{{comment.author.image_file}}"/>
+            </a>
+
+            <a class="mr-2" href="{{ url_for('user_posts', username=comment.author.username) }}">{{ comment.author.username }}</a>
+
+            {% if comment.author.team.name != '-' %}
+                <span class="mr-2 badge badge-pill badge-secondary">{{ comment.author.team.name }}</span>
+            {% endif %}
+
+            <small class="mr-2 text-muted">{{ comment.date_commented.strftime('%Y-%m-%d %H:%M') }}</small>
+            
+            <div class="ml-auto">
+            
+                {% if current_user.is_authenticated %}
+
+                    {% if current_user.has_liked_comment(comment) %}
+                    <a id="like-comment-button-{{ comment.id }}" onclick="likeCommentAction('{{ comment.id }}', 'unlike'); return false;" class="mr-1" role="button">
+                        <img id="like-comment-img-{{ comment.id }}" src="{{ url_for('static', filename='hand.thumbsup.fill.png') }}" alt="Thumbs Up Icon">
+                    </a>
+                    {% else %}
+
+                    <a id="like-comment-button-{{ comment.id }}" onclick="likeCommentAction('{{ comment.id }}', 'like'); return false;" class="mr-1" role="button">
+                        <img id="like-comment-img-{{ comment.id }}" src="{{ url_for('static', filename='hand.thumbsup.png') }}" alt="Thumbs Up Icon">
+                    </a>
+                    {% endif %}
+                {% else %}
+                <a class="mr-1">
+                    <img src="{{ url_for('static', filename='hand.thumbsup.png') }}" alt="Thumbs Up Icon">
+                </a>
+                {% endif %}
+                <small id="like-comment-count-{{ comment.id }}" class="mr-2">{{ comment.likes.count() }}</small>
+
+            </div>
+        </div>
+
+        <p class="article-content">{{ comment.content }}</p>
+
+
+        <div class="media-body ml-2">       
+            {% if comment.replies %}
+    
+                {% for comment in comment.replies %}
+                    {% include 'comment_template.html' %}
+                {% endfor %}
+            {% endif %}
+        </div>
+
+
+
+        <div>
+            {% if current_user.is_authenticated %}
+                <button data-toggle="modal" data-target="#CommentModalCenter" onclick="commentPost('{{ post.id }}', '{{ current_user.username }}', '{{ comment.id }}')" class="btn btn-sm btn-primary">Reply to comment</button>
+            {% endif %}
+
+            {% if comment.author == current_user %}
+                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#DeleteCommentModalCenter">Delete</button>
+                
+                <!-- Modal for deletion of a comment -->
+                <div class="modal fade" id="DeleteCommentModalCenter" tabindex="-1" role="dialog" aria-labelledby="DeleteCommentModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="DeleteCommentModalLongTitle">DELETE COMMENT</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-footer">
+                                <form action="{{ url_for('comment_delete', post_id=post.id, comment_id=comment.id) }}" method="POST">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input class="btn btn-sm btn-danger" type="submit" value="DELETE">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            {% endif %}
+        </div>
+    </div>
+</article>
