@@ -85,22 +85,22 @@ soffcoachen/
 │   ├── config_blueprints.py    # Blueprint configuration for Flask routes
 │   ├── config_data.py          # Configuration for app data and constants
 │   ├── config_logging.py       # Logging configuration for the application
-│   ├── extensions.py           # Flask extensions (like SQLAlchemy, Marshmallow, etc.)
+│   ├── extensions.py           # Flask extensions (like SQLAlchemy, Loggin Manager, etc.)
 │   ├── forms.py                # Flask-WTF forms for user input
 │   ├── models.py               # SQLAlchemy models for the app's database
 │   ├── routes/                 # Contains route definitions (modularized by type)
 │   │   ├── __init__.py         # Initializes and registers all routes
 │   │   ├── ajax_routes.py      # Routes for AJAX requests
-│   │   ├── api_routes.py       # API endpoints (e.g., for frontend API calls)
+│   │   ├── api_routes.py       # API endpoints (NOT IN USE)
 │   │   ├── auth_routes.py      # Authentication routes (login, logout, registration, etc.)
 │   │   ├── error_routes.py     # Custom error pages (404, 500, etc.)
 │   │   ├── no_auth_routes.py   # Publicly accessible routes (no authentication required)
-│   │   ├── routes.py           # Main routes (can be for dashboard or primary app pages)
+│   │   ├── routes.py           # Main routes (NOT IN USE)
 │   │   └── utils.py            # Utility functions used within routes
-│   ├── static/                 # Static files (CSS, JS, images, fonts, etc.)
-│   └── templates/              # HTML templates for the views
-├── venv/                       # Virtual environment (not included in version control)
-├── .env                        # Environment variables (secrets, configs, etc.) — not committed
+│   ├── static/                 # Static files (CSS, images, fonts, etc.)
+│   └── templates/              # HTML templates for the routes
+├── venv/                       # Virtual environment — not committed
+├── .env                        # Environment variables — not committed
 ├── requirements.txt            # Python dependencies for the project
 ├── start.sh                    # Script to start the application
 └── README.md                   # You're looking at it now!
