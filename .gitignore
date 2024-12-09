@@ -3,6 +3,7 @@ local-storage-container/
 htmlcov
 .DS_Store
 dummy_data.py
+.openssh/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
