@@ -5,22 +5,25 @@ from datetime import datetime, timedelta
 
 from app.models import User, Post, Comment, Team, PostLike
 from app.forms import RegistrationForm, LoginForm, PostForm, RequestResetForm, ResetPasswordForm, CommentForm, UpdatePostForm, SearchPostsForm
-from app import db, bcrypt, tags, limiter
+from app import db, bcrypt, limiter
 from flask import current_app as app
 from flask_login import login_user
 from .auth_routes import current_user
-from routes.utils import get_image_path_no_name, send_reset_email
+from .utils import get_image_path_no_name, send_reset_email
+
+from app.config_data import get_tags
+
+tags = get_tags()
 
 no_auth_bp = Blueprint('no_auth', __name__)
 
+
+
 ########################### ROUTES THAT DON'T NEED AUTH #################################
-@app.route('/', methods=['GET', 'POST'])
+@no_auth_bp.route('/', methods=['GET', 'POST'])
 def home():
     """
     Home/Start creen. Handles both authenticated and not authenticated users.
-    """
-    return "hej"
-
     """
     query = Post.query
     
@@ -37,10 +40,11 @@ def home():
             db.session.add(post)
             db.session.commit()
             flash('Your post has been submitted!', 'success')
-            return redirect(url_for('home'))
+            return redirect(url_for('no_auth.home'))
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
+            app.logger.error(f'An error occurred: {str(e)}')
             flash(f'An error occurred: {str(e)}', 'danger')
     
     # Search field functionality
@@ -85,6 +89,8 @@ def home():
     if current_user.is_authenticated:
         following_list = current_user.followers
 
+    print("home")
+
     return render_template('home.html',
                            post=paged_posts, 
                            post_form=post_form,
@@ -95,10 +101,9 @@ def home():
                            following_list=following_list,
                            no_of_posts=no_of_posts,
                            image_path=get_image_path_no_name(app=app))
-"""
 
 
-@app.route('/team/<string:team>', methods=['GET', 'POST'])
+@no_auth_bp.route('/team/<string:team>', methods=['GET', 'POST'])
 def team(team, tag=None):
     tag = request.args.get('tag')
     page = request.args.get('page', 1, type=int)
@@ -124,7 +129,7 @@ def team(team, tag=None):
             db.session.add(post)
             db.session.commit()
             flash('Your post has been created!', 'success')
-            return redirect(url_for('team', team=team, tag=tag))
+            return redirect(url_for('no_auth.team', team=team, tag=tag))
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
@@ -160,13 +165,13 @@ def team(team, tag=None):
                            image_path=get_image_path_no_name(app))
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@no_auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """
     Register new user
     """
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('no_auth.home'))
     form = RegistrationForm()
     if form.validate_on_submit():
         try:
@@ -179,7 +184,7 @@ def register():
             db.session.commit()
             login_user(user)
             flash(f'Account has been created, and you have been logged in. Welcome!', 'success')
-            return redirect(url_for('home'))
+            return redirect(url_for('no_auth.home'))
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
@@ -200,7 +205,7 @@ def register():
                            most_liked_posts=most_liked_posts)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@no_auth_bp.route('/login', methods=['GET', 'POST'])
 @limiter.limit("5 per minute")  # Allow 5 login attempts per minute
 def login():
     form = LoginForm()
@@ -210,7 +215,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('home'))
+            return redirect(next_page) if next_page else redirect(url_for('no_auth.home'))
         else:
             flash('Login unsuccessful. Please check email and password', 'danger')
 
@@ -229,7 +234,7 @@ def login():
                            most_liked_posts=most_liked_posts)
 
 
-@app.route('/post/<int:post_id>')
+@no_auth_bp.route('/post/<int:post_id>')
 def post(post_id):
     post = Post.query.get_or_404(post_id)
     comments = Comment.query.filter_by(post_id=post.id).all()
@@ -265,7 +270,7 @@ def post(post_id):
                            image_path=get_image_path_no_name(app))
 
 
-@app.route('/user/<string:username>')
+@no_auth_bp.route('/user/<string:username>')
 def user_posts(username):
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=username).first_or_404()
@@ -302,27 +307,27 @@ def user_posts(username):
                            image_path=get_image_path_no_name(app))    
 
 
-@app.route('/reset_password', methods=['GET', 'POST'])
+@no_auth_bp.route('/reset_password', methods=['GET', 'POST'])
 def reset_request():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('no_auth.home'))
     form = RequestResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         send_reset_email(user)
         flash('An email has been sent to reset your password.', 'info')
-        return redirect(url_for('login'))
+        return redirect(url_for('no_auth.login'))
     return render_template('reset_request.html', title='Reset Password', form=form)
 
 
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+@no_auth_bp.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_token(token):
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('no_auth.home'))
     user = User.verify_reset_token(token)
     if not user:
         flash('invalid token error', 'warning')
-        return redirect(url_for('reset_request'))
+        return redirect(url_for('no_auth.reset_request'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         try:
@@ -330,7 +335,7 @@ def reset_token(token):
             user.password = hashed_pw
             db.session.commit()
             flash(f'Your password has been updated. Try logging in!', 'success')
-            return redirect(url_for('login'))
+            return redirect(url_for('no_auth.login'))
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()

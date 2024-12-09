@@ -56,7 +56,7 @@
                         </button>
                     </div>
                     <div class="modal-footer">
-                        <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+                        <form action="{{ url_for('ajax.delete_post', post_id=post.id) }}" method="POST">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <input class="btn btn-danger" type="submit" value="DELETE">
                         </form>

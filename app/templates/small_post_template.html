@@ -1,6 +1,6 @@
 <div class="article-metadata d-flex align-items-center">
 
-    <a class="mr-2" href="{{ url_for('user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
+    <a class="mr-2" href="{{ url_for('no_auth.user_posts', username=post.author.username) }}">{{ post.author.username }}</a>
 
     {% if post.author.team.name != '-' %}
         <span class="mr-2 badge badge-pill badge-secondary">{{ post.author.team.name }}</span>
@@ -38,12 +38,12 @@
 
         {% if post.team.logo is not none %}
             <li class="breadcrumb-item">
-                <a href="{{ url_for('team', team=post.team.name) }}">{{ post.team.name }}</a>
+                <a href="{{ url_for('no_auth.team', team=post.team.name) }}">{{ post.team.name }}</a>
             </li>
 
             {% if post.tag %}
             <li class="breadcrumb-item">
-                <a href="{{ url_for('team', team=post.team.name, tag=post.tag if post.tag else '') }}">#{{ post.tag }}</a>
+                <a href="{{ url_for('no_auth.team', team=post.team.name, tag=post.tag if post.tag else '') }}">#{{ post.tag }}</a>
             </li>
             {% endif %}
         {% else %}
@@ -60,7 +60,7 @@
 {% endif %}
 
 
-<a href="{{ url_for('post', post_id=post.id) }}" role="button">
+<a href="{{ url_for('no_auth.post', post_id=post.id) }}" role="button">
     <h4 id="post-title-{{ post.id }}" class="article-title">{{ post.title }}</h4>
     <h6 id="post-content-{{ post.id }}" class="article-content">{{ post.content }}</h6>
 </a>

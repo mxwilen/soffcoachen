@@ -26,7 +26,7 @@
 
                 <div class="container">
 
-                    <a class="navbar-brand mr-4" href="{{ url_for('home') }}">SoffCoachen</a>
+                    <a class="navbar-brand mr-4" href="{{ url_for('no_auth.home') }}">SoffCoachen</a>
                     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
@@ -40,11 +40,11 @@
                         <!-- Navbar Right Side -->
                         <div class="navbar-nav">
                             {% if current_user.is_authenticated %}
-                            <a class="nav-item nav-link" href="{{ url_for('account') }}">{{ current_user.username}}</a>
-                            <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+                            <a class="nav-item nav-link" href="{{ url_for('auth.account') }}">{{ current_user.username}}</a>
+                            <a class="nav-item nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
                             {% else %}
-                            <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
-                            <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
+                            <a class="nav-item nav-link" href="{{ url_for('no_auth.login') }}">Login</a>
+                            <a class="nav-item nav-link" href="{{ url_for('no_auth.register') }}">Register</a>
                             {% endif%}
                         </div>
 
@@ -71,7 +71,7 @@
         
                     {% for team in teams %}
                         <div class="ml-4">
-                            <a href="{{ url_for('team', team=team.name) }}">
+                            <a href="{{ url_for('no_auth.team', team=team.name) }}">
                                 <img class="team-logo-big" src="{{ url_for('static', filename='team-logos/' + team.abr + '.png') }}">
                             </a>
                         </div>
@@ -116,7 +116,7 @@
                                         <img class="mr-2 account-img-small rounded-circle" src="{{image_path}}/{{current_user.image_file}}"/>
                                     </a>
 
-                                    <a class="mr-2" href="{{ url_for('user_posts', username=user.username) }}">{{ user.username }}</a>
+                                    <a class="mr-2" href="{{ url_for('no_auth.user_posts', username=user.username) }}">{{ user.username }}</a>
                                 
                                     {% if user.team %}
                                         <span class="mr-2 badge badge-pill badge-secondary">{{ user.team.name }}</span>

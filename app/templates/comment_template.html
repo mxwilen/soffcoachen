@@ -6,7 +6,7 @@
                 <img class="mr-2 account-img-small rounded-circle" src="{{image_path}}/{{comment.author.image_file}}"/>
             </a>
 
-            <a class="mr-2" href="{{ url_for('user_posts', username=comment.author.username) }}">{{ comment.author.username }}</a>
+            <a class="mr-2" href="{{ url_for('no_auth.user_posts', username=comment.author.username) }}">{{ comment.author.username }}</a>
 
             {% if comment.author.team.name != '-' %}
                 <span class="mr-2 badge badge-pill badge-secondary">{{ comment.author.team.name }}</span>
@@ -71,7 +71,7 @@
                                 </button>
                             </div>
                             <div class="modal-footer">
-                                <form action="{{ url_for('comment_delete', post_id=post.id, comment_id=comment.id) }}" method="POST">
+                                <form action="{{ url_for('auth.comment_delete', post_id=post.id, comment_id=comment.id) }}" method="POST">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input class="btn btn-sm btn-danger" type="submit" value="DELETE">
                                 </form>

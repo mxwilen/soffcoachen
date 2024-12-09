@@ -2,7 +2,7 @@ import pytz
 from flask import request, redirect, url_for, flash, Blueprint
 from flask.json import jsonify
 from datetime import datetime
-from soffcoachen.app.models import User, Post, Comment
+from app.models import User, Post, Comment
 # from app import app, db
 from app import db
 from flask import current_app as app
@@ -12,14 +12,14 @@ from .auth_routes import current_user
 ajax_bp = Blueprint('ajax', __name__)
 
 ########################### AJAX ROUTES #################################
-@app.route('/post/<int:post_id>/update', methods=['POST'])
+@ajax_bp.route('/post/<int:post_id>/update', methods=['POST'])
 @login_required
 def update_post(post_id):
     post = Post.query.get_or_404(post_id)
 
     if post.user_id != current_user.id:
         flash('try updating your own posts instead!', 'warning')
-        return redirect(url_for('home'))
+        return redirect(url_for('no_auth.home'))
 
     if request.method == 'POST':
         try:
@@ -40,7 +40,7 @@ def update_post(post_id):
 
 
 
-@app.route('/post/<int:post_id>/delete', methods=['GET', 'POST'])
+@ajax_bp.route('/post/<int:post_id>/delete', methods=['GET', 'POST'])
 @login_required
 def delete_post(post_id):
     post = Post.query.get_or_404(post_id)
@@ -48,7 +48,7 @@ def delete_post(post_id):
     
     if post.user_id != current_user.id and current_user.role != 'admin':
         flash('Try deleting your own posts instead!', 'warning')
-        return redirect(url_for('home'))
+        return redirect(url_for('no_auth.home'))
     
     try:
         for c in comments:
@@ -60,10 +60,10 @@ def delete_post(post_id):
         # Rollback the transaction if there's an error
         db.session.rollback()
         flash(f'An error occurred: {str(e)}', 'danger')
-    return redirect(url_for('home'))
+    return redirect(url_for('no_auth.home'))
 
 
-@app.route('/post/<int:post_id>/comment/<string:username>', methods=['GET', 'POST'])
+@ajax_bp.route('/post/<int:post_id>/comment/<string:username>', methods=['GET', 'POST'])
 @login_required
 def comment_post(post_id, username):
 
@@ -103,7 +103,7 @@ def comment_post(post_id, username):
     return jsonify({"status": "success"})
 
 
-@app.route('/like/post/<int:post_id>/<action>')
+@ajax_bp.route('/like/post/<int:post_id>/<action>')
 @login_required
 def like_post_action(post_id, action):
     try:
@@ -123,7 +123,7 @@ def like_post_action(post_id, action):
     return jsonify({'like_count': post.likes.count()}, 
                    {'has_liked': current_user.has_liked_post(post)})
 
-@app.route('/like/comment/<int:comment_id>/<action>')
+@ajax_bp.route('/like/comment/<int:comment_id>/<action>')
 @login_required
 def like_comment_action(comment_id, action):
     try:
