@@ -42,7 +42,7 @@ Engage in passionate discussions, share insights, and stay up-to-date with the l
 
 1️⃣ **Clone the repository**  
 ```bash
-git clone https://github.com/your-username/soffcoachen.git
+git clone https://github.com/mxwilen/soffcoachen.git
 cd soffcoachen
 ```
 
