@@ -1,12 +1,15 @@
 import pytz
-from flask import request, redirect, url_for, flash
+from flask import request, redirect, url_for, flash, Blueprint
 from flask.json import jsonify
 from datetime import datetime
-from app.models import User, Post, Comment
-from app import app, db
+from soffcoachen.app.models import User, Post, Comment
+# from app import app, db
+from app import db
+from flask import current_app as app
 from flask_login import login_required
 from .auth_routes import current_user
 
+ajax_bp = Blueprint('ajax', __name__)
 
 ########################### AJAX ROUTES #################################
 @app.route('/post/<int:post_id>/update', methods=['POST'])

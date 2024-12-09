@@ -3,8 +3,6 @@ import uuid
 import secrets
 from flask import flash, abort
 from PIL import Image
-from azure.identity import DefaultAzureCredential
-from azure.storage.blob import BlobServiceClient
 
 from .auth_routes import current_user
 

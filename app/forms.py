@@ -3,11 +3,22 @@ from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from app.models import User
-from . import tags, teams
+from app.models import User, Team
+from . import tags#, teams
 
 import logging
 
+from flask import current_app as app
+# from . import db, login_manager#, app
+
+def get_db():
+    from soffcoachen.app import db  # Import db here to avoid circular import
+    return db
+
+db = get_db()
+
+# teams = [(team.name) for team in Team.query.all()]
+teams = [('dif'), ('aik')]
 
 def validate_no_injection_characters(form, field):
     """

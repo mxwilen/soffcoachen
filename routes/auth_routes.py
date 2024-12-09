@@ -1,15 +1,18 @@
 import pytz
 import os
-from flask import Response, render_template, request, redirect, url_for, flash, abort
+from flask import Response, render_template, request, redirect, url_for, flash, abort, Blueprint
 from datetime import datetime, timedelta
 
 from app.models import User, Post, Comment, Team, PostLike
 from app.forms import UpdateAccountForm, RequestResetForm
-from app import app, db
+# from app import app, db
+from flask import current_app as app
+from app import db
 from flask_login import current_user, logout_user, login_required
 
 from routes.utils import get_image_path_no_name, save_picture, send_reset_email
 
+auth_bp = Blueprint('auth', __name__)
 
 ########################### ROUTES THAT NEED AUTH #################################
 @app.route('/logout')
