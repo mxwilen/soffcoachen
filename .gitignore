@@ -4,6 +4,9 @@ htmlcov
 .DS_Store
 dummy_data.py
 suspicious_activity.log
+gunicorn-error.log
+azureproject/
+.openssh/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
