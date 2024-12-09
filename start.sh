@@ -1,4 +1,5 @@
 #!/bin/bash -v
+source ../.env
 
 echo "-- ACTIVATING PYTHON ENVIRONMENT --"
 source venv/bin/activate
@@ -19,4 +20,4 @@ echo "-- DONE UPGRADING --"
 echo "-- STARTING APPLICATION --"
 echo "Using Python: $(which python)"
 echo "Python version: $(python --version)"
-gunicorn --bind=0.0.0.0:8000 --timeout 120 --error-logfile gunicorn-error.log --capture-output wsgi:app
+gunicorn --bind=0.0.0.0:8000 --timeout 120 wsgi:app
