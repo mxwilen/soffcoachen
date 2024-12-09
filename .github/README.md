@@ -77,6 +77,7 @@ The app will be available at **http://127.0.0.1:5000**.
 ---
 
 ## 🌐 **Project Structure**
+```bash
 soffcoachen/
 ├── app/
 │   ├── __init__.py             # Application factory, initializes extensions, and blueprints
@@ -103,7 +104,7 @@ soffcoachen/
 ├── requirements.txt            # Python dependencies for the project
 ├── start.sh                    # Script to start the application
 └── README.md                   # You're looking at it now!
-
+```
 ---
 
 ## 📸 **Screenshots**
