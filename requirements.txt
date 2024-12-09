@@ -6,7 +6,6 @@ Flask-Mail
 Flask-Bcrypt
 Flask-Login
 Flask-Blueprint
-psycopg2
 python-dotenv
 SQLAlchemy
 azure-storage-blob
@@ -17,3 +16,6 @@ itsdangerous
 WTForms
 email-validator
 Flask-Limiter
+psycopg2-binary
+gunicorn
+boto3

@@ -1,21 +1,26 @@
 import pytz
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, Blueprint
 from flask.json import jsonify
 from datetime import datetime, timedelta
 
 from app.models import User, Post, Comment, Team, PostLike
 from app.forms import RegistrationForm, LoginForm, PostForm, RequestResetForm, ResetPasswordForm, CommentForm, UpdatePostForm, SearchPostsForm
-from app import app, db, bcrypt, tags, limiter
+from app import db, bcrypt, tags, limiter
+from flask import current_app as app
 from flask_login import login_user
 from .auth_routes import current_user
 from routes.utils import get_image_path_no_name, send_reset_email
 
+no_auth_bp = Blueprint('no_auth', __name__)
 
 ########################### ROUTES THAT DON'T NEED AUTH #################################
 @app.route('/', methods=['GET', 'POST'])
 def home():
     """
     Home/Start creen. Handles both authenticated and not authenticated users.
+    """
+    return "hej"
+
     """
     query = Post.query
     
@@ -90,7 +95,7 @@ def home():
                            following_list=following_list,
                            no_of_posts=no_of_posts,
                            image_path=get_image_path_no_name(app=app))
-
+"""
 
 
 @app.route('/team/<string:team>', methods=['GET', 'POST'])

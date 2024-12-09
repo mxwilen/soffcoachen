@@ -1,6 +1,7 @@
-from flask import render_template
-from app import app
+from flask import render_template, Blueprint, current_app as app
 from flask_limiter.errors import RateLimitExceeded
+
+error_bp = Blueprint('error', __name__)
 
 @app.errorhandler(400)
 def bad_request(e):
