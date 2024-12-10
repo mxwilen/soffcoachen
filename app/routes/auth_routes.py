@@ -5,24 +5,23 @@ from datetime import datetime, timedelta
 
 from app.models import User, Post, Comment, Team, PostLike
 from app.forms import UpdateAccountForm, RequestResetForm
-# from app import app, db
 from flask import current_app as app
 from app import db
 from flask_login import current_user, logout_user, login_required
 
-from routes.utils import get_image_path_no_name, save_picture, send_reset_email
+from .utils import get_image_path_no_name, save_picture, send_reset_email
 
 auth_bp = Blueprint('auth', __name__)
 
 ########################### ROUTES THAT NEED AUTH #################################
-@app.route('/logout')
+@auth_bp.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('no_auth.home'))
 
 
-@app.route('/view-logs', methods=['GET'])
+@auth_bp.route('/view-logs', methods=['GET'])
 @login_required
 def view_logs():
     """
@@ -43,7 +42,7 @@ def view_logs():
     return Response(generate(), mimetype='text/plain')
 
 
-@app.route('/account', methods=['GET', 'POST'])
+@auth_bp.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     form = UpdateAccountForm()
@@ -68,7 +67,7 @@ def account():
             current_user.email = form.email.data
             db.session.commit()
             flash('Your account has been updated!', 'success')
-            return redirect(url_for('account'))
+            return redirect(url_for('auth.account'))
         except Exception as e:
             # Rollback the transaction if there's an error
             db.session.rollback()
@@ -100,7 +99,7 @@ def account():
                            image_path=get_image_path_no_name(app))
 
 
-@app.route('/post/<int:post_id>/comment/delete/<int:comment_id>', methods=['GET', 'POST'])
+@auth_bp.route('/post/<int:post_id>/comment/delete/<int:comment_id>', methods=['GET', 'POST'])
 @login_required
 def comment_delete(post_id, comment_id):
     try:
@@ -110,15 +109,15 @@ def comment_delete(post_id, comment_id):
             db.session.delete(comment)
             db.session.commit()
             flash(f'Comment has been deleted by admin: {current_user.username}', 'success')
-            return redirect(url_for('post', post_id=post_id))
+            return redirect(url_for('no_auth.post', post_id=post_id))
 
         if comment.user_id != current_user.id:
             flash('Error: try deleting your own comments instead!', 'warning')
-            return redirect(url_for('home'))
+            return redirect(url_for('no_auth.home'))
         
         if comment.post_id != post_id:
             flash('Error: tried to delete a comment to another post!', 'warning')
-            return redirect(url_for('home'))
+            return redirect(url_for('no_auth.home'))
         
         db.session.delete(comment)
         db.session.commit()
@@ -127,10 +126,10 @@ def comment_delete(post_id, comment_id):
         # Rollback the transaction if there's an error
         db.session.rollback()
         flash(f'An error occurred: {str(e)}', 'danger')
-    return redirect(url_for('post', post_id=post_id))
+    return redirect(url_for('no_auth.post', post_id=post_id))
 
 
-@app.route('/follow/<int:user_id>')
+@auth_bp.route('/follow/<int:user_id>')
 @login_required
 def follow_user(user_id):
     try:

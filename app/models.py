@@ -8,22 +8,15 @@ from sqlalchemy.orm import validates
 from flask_login import UserMixin
 from flask import current_app as app
 
-def get_db():
-    from .app import db  # Import db here to avoid circular import
-    return db
+from app.extensions import db, login_manager
 
-# db = get_db()
-
-#from soffcoachen.app import login_manager
-#@login_manager.user_loader
-#def load_user(user_id):
-#    return User.query.get(int(user_id))
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
-class User(get_db().Model, UserMixin):
+class User(db.Model, UserMixin):
     # __tablename__ = 'users'
-    db = get_db()
-
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -142,10 +135,8 @@ class User(get_db().Model, UserMixin):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
 
-class Post(get_db().Model):
+class Post(db.Model):
     # __tablename__ = 'posts'
-    db = get_db()
-
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     date_posted = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(pytz.timezone('Europe/Stockholm')))
@@ -187,10 +178,8 @@ class Post(get_db().Model):
         return f"Post('{self.title}', '{self.user_id}', '{self.date_posted}')"
     
 
-class Team(get_db().Model):
+class Team(db.Model):
     # __tablename__ = 'teams'
-    db = get_db()
-
     name = db.Column(db.String(50), primary_key=True)
     abr = db.Column(db.String(50), nullable=False)
     city = db.Column(db.String(50), nullable=True)
@@ -221,10 +210,8 @@ class Team(get_db().Model):
 
 
 
-class Comment(get_db().Model):
+class Comment(db.Model):
     # __tablename__ = 'comments'
-    db = get_db()
-
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.Text, nullable=False)
     date_commented = db.Column(db.DateTime, nullable=False, default=lambda: datetime.now(pytz.timezone('Europe/Stockholm')))
@@ -249,18 +236,14 @@ class Comment(get_db().Model):
     def __repr__(self):
         return f"Comment('{self.id}', made by user: '{self.user_id}', on: '{self.date_commented}')"
 
-class PostLike(get_db().Model):
+class PostLike(db.Model):
     # __tablename__ = 'postlikes'
-    db = get_db()
-
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     post_id = db.Column(db.Integer, db.ForeignKey('post.id'))
 
-class CommentLike(get_db().Model):
+class CommentLike(db.Model):
     # __tablename__ = 'commentlikes'
-    db = get_db()
-
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'))

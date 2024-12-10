@@ -1,100 +1,66 @@
-import os
-import secrets
 from flask import Flask
-from flask_mail import Mail
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
-from flask_migrate import Migrate
-from flask_wtf.csrf import CSRFProtect
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-import logging
+import secrets
+import os
 
-from .utils import get_database_uri
-
+from config import Config
+from app.extensions import db, migrate, mail, bcrypt, limiter, login_manager, csrf
+from app.config_logging import configure_logging
 
 def create_app():
-    """Application factory."""
+    """Application factory function."""
     print("Initializing the Flask application...")
-    
-    app = Flask(__name__, template_folder='../templates/', static_folder='../static')
 
-    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-    app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
-    app.config['MAIL_PORT'] = 587
-    app.config['MAIL_USE_TLS'] = True
-    
-    # Configure the app
-    # app.config.from_object("config.Config")
+    # Create the app instance
+    app = Flask(__name__, template_folder='templates/', static_folder='static/')
 
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_DATABASE_URI'] = get_database_uri()
+    # Load the configuration
+    app.config.from_object(Config)
 
+    # Log errors to the console
+    import logging
+    if not app.debug:
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.ERROR)
+        app.logger.addHandler(handler)
 
+    # Generate a SECRET_KEY if not found in environment variables
     if 'SECRET_KEY' in os.environ:
         app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
     else:
         print("No SECRET_KEY found. Generating new.")
         app.config['SECRET_KEY'] = secrets.token_hex()
 
-    # Initialize Flask extensions (but do not bind them to the app yet)
-    db = SQLAlchemy()
-    migrate = Migrate()
-    csrf = CSRFProtect()
-    mail = Mail()
-    bcrypt = Bcrypt()
-    limiter = Limiter(key_func=get_remote_address, default_limits=["200 per day", "50 per hour"])
-    login_manager = LoginManager()
+    # Initialize logging
+    configure_logging()
 
-    # Logging configuration
-    logging.basicConfig(
-        filename="suspicious_activity.log",
-        level=logging.WARNING,
-        format="%(asctime)s - %(levelname)s - %(message)s",
-    )
-
-    tags = ["transfers & truppbygge", "matcher", "kultur", "förening", "övrigt"]
-
-    # Initialize Flask extensions with the app
+    # Initialize Flask extensions
     db.init_app(app)
     migrate.init_app(app, db)
-    csrf.init_app(app)
     mail.init_app(app)
     bcrypt.init_app(app)
     limiter.init_app(app)
+    csrf.init_app(app)
     login_manager.init_app(app)
-    login_manager.login_view = "auth.login"
+
+    # Configure login manager
+    login_manager.login_view = "no_auth.login"
     login_manager.login_message_category = "info"
 
+    # Register blueprints
+    # from app.config_blueprints import register_blueprints
+    from app.routes import init_blueprints, register_blueprints
+    register_blueprints(app)
+    # init_blueprints(app)
+
     with app.app_context():
-        # Import models to ensure they are registered with SQLAlchemy
-        # from . import models  # Import models here
-
-        # Import and register blueprints
-        # from routes import auth_routes, no_auth_routes, ajax_routes, error_routes
-        # app.register_blueprint(auth_routes.bp)
-        # app.register_blueprint(no_auth_routes.bp)
-        # app.register_blueprint(ajax_routes.bp)
-        # app.register_blueprint(error_pages.bp)
-
-        from soffcoachen.routes import init_blueprints
-        # from routes import init_blueprints
-        init_blueprints(app)
-
-        # Generate dummy data
         from dummy_data import generate_dummy
-        # generate_dummy(db)
-        db.drop_all()
-        db.session.commit()
-        db.create_all()
+        generate_dummy(app, db)
 
-        # from .models import Team
-        # teams = [(team.name) for team in Team.query.all()]
+        # from .models import Team  # Import models inside app context
+        # Query the teams and make them part of the app config
+        # app.config['TEAMS'] = [team.name for team in Team.query.all()]
+        # app.config['TAGS'] = ["transfers & truppbygge", "matcher", "kultur", "förening", "övrigt"]
+
 
     return app
 
-
-
-#if __name__ == '__main__':
-#   app.run()

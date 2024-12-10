@@ -42,6 +42,8 @@ def get_database_uri():
     secret_name = os.getenv("AWS_SECRET_NAME")
     region_name = os.getenv("AWS_REGION")
 
+    # return 'postgresql+psycopg2://localhost/maxwilen'
+    
     if not secret_name or not region_name:
         raise ValueError("AWS_SECRET_NAME and AWS_REGION must be set as environment variables.")
 

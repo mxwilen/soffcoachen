@@ -30,7 +30,7 @@
             {% for tag in tags %}
                 <div class="mr-4 ml-auto">
                     <h5>
-                        <a href="{{ url_for('team', team=team.name, tag=tag) }}">#{{ tag }}</a>
+                        <a href="{{ url_for('no_auth.team', team=team.name, tag=tag) }}">#{{ tag }}</a>
                     </h5>
                 </div>
             {% endfor %}
@@ -59,9 +59,9 @@
     {% for page_num in post.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
         {% if page_num %}
             {% if post.page == page_num %}
-                <a class="btn btn-secondary mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+                <a class="btn btn-secondary mb-4" href="{{ url_for('no_auth.home', page=page_num) }}">{{ page_num }}</a>
             {% else %}
-                <a class="btn btn-outline-secondary mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+                <a class="btn btn-outline-secondary mb-4" href="{{ url_for('no_auth.home', page=page_num) }}">{{ page_num }}</a>
             {% endif %}
         {% else %}
             ...
