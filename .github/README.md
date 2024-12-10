@@ -1,5 +1,5 @@
 
-# 🏟️ **Soffcoachen** — *A Web-Based Discussion Forum for Football Enthusiasts*  
+# 🏟️ **SoffCoachen** — *A Web-Based Discussion Forum for Football Enthusiasts*  
 
 Engage in passionate discussions, share insights, and stay up-to-date with the latest in football — all in one place. **Soffcoachen** provides a lightweight, fast, and secure platform for football lovers to connect in real time.  
 
