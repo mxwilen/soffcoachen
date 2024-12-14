@@ -54,7 +54,7 @@ def create_app():
 
     with app.app_context():
         from dummy_data import generate_dummy
-        generate_dummy(app, db)
+        # generate_dummy(app, db)
 
         # from .models import Team  # Import models inside app context
         # Query the teams and make them part of the app config

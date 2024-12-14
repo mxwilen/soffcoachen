@@ -13,6 +13,9 @@ from .utils import get_image_path_no_name, send_reset_email
 
 from app.config_data import get_tags
 
+# Safe image retrieval
+from werkzeug.utils import safe_join
+
 tags = get_tags()
 
 no_auth_bp = Blueprint('no_auth', __name__)
@@ -20,6 +23,18 @@ no_auth_bp = Blueprint('no_auth', __name__)
 
 
 ########################### ROUTES THAT DON'T NEED AUTH #################################
+"""
+@app.route('/team-logo/')
+def get_team_logo():
+    # Use safe_join to ensure the path stays inside 'static/team-logos/'
+    safe_path = safe_join('static/team-logos', 'dif.png')
+    return safe_path
+
+    # Check if the file exists
+    if not os.path.isfile(safe_path):
+      abort(404)  # Return 404 if the file doesn't exist
+    return send_from_directory(safe_path)
+"""
 @no_auth_bp.route('/', methods=['GET', 'POST'])
 def home():
     """
@@ -88,8 +103,6 @@ def home():
     following_list = []
     if current_user.is_authenticated:
         following_list = current_user.followers
-
-    print("home")
 
     return render_template('home.html',
                            post=paged_posts, 

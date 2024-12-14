@@ -5,11 +5,18 @@ Engage in passionate discussions, share insights, and stay up-to-date with the l
 
 ---
 
-## **Current work**
+## 💼**Current work**
 
-- Finishing up deployment-switch to AWS (Changed from Azure)
+- [ ] Finishing up deployment-switch to AWS (Changed from Azure)
+  - [ ] Configure storage location to save new profile pictures
+  - [x] HTTPS and domain registration
 - Secure against OWASP Top 10
+  - [ ] Implement path-traversal validation on picture upload
+  - [ ] mask "hidden" path requests
 - Extending functionality
+  - [ ] add external API for allsvenskan standings
+  - [ ] change teams
+  - [ ] add 'superettan'
 
 ---
 
