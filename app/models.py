@@ -10,6 +10,9 @@ from flask import current_app as app
 
 from app.extensions import db, login_manager
 
+# Safe file path traversal
+from werkzeug.utils import safe_join
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -197,7 +200,13 @@ class Team(db.Model):
             self.logo = self.set_logo()
 
     def set_logo(self):
-        return os.path.join(app.root_path, 'static', 'team-logos', self.abr + '.png')
+        # Join the path safely, and ensure it's under the 'team-logos' directory
+        file_path = safe_join('static/team-logos/', f'{self.abr}.png')
+
+        # Check if the file exists to avoid information disclosure
+        if not os.path.isfile(file_path):
+          abort(404)  # Return 404 if the file doesn't exist  
+        return file_path
     
     def to_dict(self):
         return {

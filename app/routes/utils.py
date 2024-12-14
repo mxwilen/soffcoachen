@@ -6,7 +6,6 @@ from PIL import Image
 
 from .auth_routes import current_user
 
-
 STORAGE_CONTAINER_NAME = 'profile-pictures'
 
 
@@ -14,7 +13,9 @@ def get_image_path_no_name(app):
     image_path = get_account_url(app) + "/" +  STORAGE_CONTAINER_NAME
     return image_path
 
+
 def get_account_url(app):
+    """
     if not 'AZURE_STORAGEBLOB_RESOURCEENDPOINT' in os.environ:
         # Create LOCAL_USE_AZURE_STORAGE environment variable to use Azure Storage locally. 
         if 'WEBSITE_HOSTNAME' in os.environ or ("LOCAL_USE_AZURE_STORAGE" in os.environ):
@@ -23,9 +24,12 @@ def get_account_url(app):
             return os.path.join(app.root_path, 'local-storage-container')
     else:
         return os.environ['AZURE_STORAGEBLOB_RESOURCEENDPOINT'].rstrip('/')
+    """
+    return "bild"  # TODO
     
 
 def save_picture(app, form_picture):
+    """
     image_data = form_picture
 
     # Get size.
@@ -76,7 +80,8 @@ def save_picture(app, form_picture):
     blob_client.upload_blob(image_data)
 
     return image_name
-
+    """
+    return "bild-namn"  # TODO
 
 def send_reset_email(user):
     abort(404)
