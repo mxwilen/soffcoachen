@@ -52,6 +52,10 @@ def create_app():
     register_blueprints(app)
     # init_blueprints(app)
 
+    # Register the error handlers
+    from app.routes.error_routes import register_error_handlers
+    register_error_handlers(app)
+
     with app.app_context():
         from dummy_data import generate_dummy
         # generate_dummy(app, db)
