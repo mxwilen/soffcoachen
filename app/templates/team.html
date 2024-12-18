@@ -8,7 +8,7 @@
         {% if tag %}
         <li class="breadcrumb-item">
             <img class="mr-2 team-logo" src="{{ url_for('static', filename='team-logos/' + team.abr + '.png') }}">
-            <a href="{{ url_for('team', team=team.name) }}">{{ team.name }}</a>
+            <a href="{{ url_for('no_auth.team', team=team.name) }}">{{ team.name }}</a>
         </li>
         <li class="breadcrumb-item active" aria-current="page">
             <a>#{{ tag }}</a>

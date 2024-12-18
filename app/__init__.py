@@ -56,11 +56,10 @@ def create_app():
         from dummy_data import generate_dummy
         # generate_dummy(app, db)
 
-        # from .models import Team  # Import models inside app context
-        # Query the teams and make them part of the app config
-        # app.config['TEAMS'] = [team.name for team in Team.query.all()]
-        # app.config['TAGS'] = ["transfers & truppbygge", "matcher", "kultur", "förening", "övrigt"]
-
+        from app.models import Team
+        from app.config_data import StoredTeams
+        teams = [(team.name) for team in Team.query.all() if team.logo]
+        StoredTeams.set_teams(teams)
 
     return app
 
